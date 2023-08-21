@@ -1,0 +1,56 @@
+pipeline {
+  agent {
+      // replace with an agent that has docker installed
+      label 'docker-agent'
+  }
+  parameters { 
+    choice(name: 'env', choices: ['dev', 'test', 'staging', 'prod'], description: 'Target environment')
+    choice(name: 'browser', choices: ['chrome', 'firefox', 'edge'], description: 'Target web browser')
+    booleanParam(name: 'dry_run', defaultValue: false, description: 'Validate without executing')
+    booleanParam(name: 'parallel', defaultValue: false, description: 'Enable parallel execution')
+    choice(name: 'threads', choices: ['auto', '2', '4', '8', '12', '16', '24', '32', '48', '64'], description: 'Number of parallel threads (auto = one thread per available core)')
+    booleanParam(name: 'headless', defaultValue: false, description: 'Enable headless browser') 
+    booleanParam(name: 'video', defaultValue: true, description: 'Enable video capture (not available with parallel or headless)') 
+  }
+  environment {
+    GWEN_ENV = "${params.env}"
+    GWEN_BROWSER = "${params.browser}"
+    GWEN_DRY_RUN = "${params.dry_run}"
+    GWEN_PARALLEL = "${params.parallel}"
+    GWEN_THREADS = "${params.threads}"
+    GWEN_HEADLESS = "${params.headless}"
+    GWEN_VIDEO = "${params.video}"
+  }
+  stages {
+    stage("Prepare") {
+      steps {
+        script {
+          // Create output dir to avoid potential permission issues in docker
+          sh 'mkdir -p gwen/output'
+        }
+      }
+    }
+    stage("Gwen") {
+      steps {
+        script {
+          // Spin up environment and execute Gwen in docker
+          sh 'docker-compose -f gwen/docker-compose.yml run gwen'
+        }
+      }
+      post {
+        always {
+          sh 'docker-compose -f gwen/docker-compose.yml down'
+          archiveArtifacts artifacts: 'gwen/output/reports/**'
+          publishHTML(target: [
+                        allowMissing          : false,
+                        alwaysLinkToLastBuild : true,
+                        keepAll               : true,
+                        reportDir             : 'gwen/output/reports/html',
+                        reportFiles           : 'index.html',
+                        reportName            : "Gwen-Report"
+          ])
+        }
+      }
+    }
+  }
+}
