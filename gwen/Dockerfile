@@ -7,5 +7,5 @@ RUN apk update \
     && apk add openjdk11-jre
 
 # Run as a non root user
-RUN addgroup -S gwen && adduser -S gwen -G gwen -u 4936
-USER gwen
+# RUN addgroup -S gwen && adduser -S gwen -G gwen -u 4936
+# USER gwen
