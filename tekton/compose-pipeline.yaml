@@ -1,0 +1,44 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: docker-compose-pipeline
+spec:
+  workspaces:
+    - name: output
+      description: The git repo
+  params:
+    - name: gitUrl
+      description: Git repository url
+    - name: gitRevision
+      description: Git revision to check out
+      default: main
+  tasks:
+    - name: clone-repo
+      taskRef:
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: output
+      params:
+        - name: url
+          value: '$(params.gitUrl)'
+        - name: revision
+          value: '$(params.gitRevision)'
+        - name: subdirectory
+          value: '.'
+        - name: deleteExisting
+          value: 'true'
+
+    - name: install-docker-compose
+      runAfter: ['clone-repo']
+      taskRef:
+        name: run-docker-compose
+      workspaces:
+        - name: output
+          workspace: output
+      params:
+        - name: docker-compose-file
+          value: '$(workspaces.output.path)/gwen/docker-compose.yml'
+        - name : docker-compose-args
+          value: 'run gwen'
+        

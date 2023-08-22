@@ -1,0 +1,48 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: run-docker-compose
+
+spec:
+  workspaces:
+    - name: output
+  params:
+    - name: docker-compose-file
+      type: string
+    - name: docker-compose-args
+      type: string
+
+  steps:
+    - name: run-docker-compose
+      image: docker/compose
+      env:
+        # Connect to the sidecar over TCP, with TLS.
+        - name: DOCKER_HOST
+          value: tcp://localhost:2375
+        - name: DOCKER_CERT_PATH
+          value: ""
+        - name: GWEN_BROWSER
+          value: "chrome"
+        - name: NO_COLOR
+          value: "1"
+        - name: SELENIUM_HUB
+          value: "selenoid"
+      script: |
+        # Wait for the sidecar to be ready.
+        while ! docker info; do sleep 1; done
+        cd $(workspaces.output.path)
+        mkdir -p gwen/output
+        docker-compose -f $(inputs.params.docker-compose-file) $(inputs.params.docker-compose-args)
+        
+
+  sidecars:
+    - name: docker
+      image: docker:dind
+      args:
+        - --storage-driver=vfs
+        - --debug
+      securityContext:
+        privileged: true
+      env:
+        - name: DOCKER_TLS_CERTDIR
+          value: ""

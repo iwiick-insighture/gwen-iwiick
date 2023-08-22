@@ -1,0 +1,16 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: compose-pipeline-run
+spec:
+  params:
+    - name: gitUrl
+      value: https://github.com/kekayann/gwen
+    - name: gitRevision
+      value: main
+  pipelineRef:
+    name: docker-compose-pipeline
+  workspaces: 
+    - name: output
+      persistentVolumeClaim:
+        claimName: output
