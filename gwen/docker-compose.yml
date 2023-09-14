@@ -28,7 +28,8 @@ services:
       # - "$PWD/gwen/output/.video:/opt/selenoid/video"
     # environment:
       # - OVERRIDE_VIDEO_OUTPUT_DIR=$PWD/gwen/output/.video
-    command: ["-container-network", "gwen-net", "-video-output-dir", "/opt/selenoid/video"]
+    # command: ["-container-network", "gwen-net", "-video-output-dir", "/opt/selenoid/video"]
+    command: ["-container-network", "gwen-net"]
   # selenoid-ui:
   #   depends_on:
   #     - selenoid
