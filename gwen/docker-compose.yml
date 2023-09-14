@@ -4,18 +4,18 @@ services:
     image: selenoid/chrome:latest
     networks:
       - gwen-net
-  edge:
-    image: browsers/edge:latest
-    networks:
-      - gwen-net
-  firefox:
-    image: selenoid/firefox:latest
-    networks:
-      - gwen-net
-  video-recorder:
-    image: selenoid/video-recorder:latest-release
-    networks:
-      - gwen-net
+  # edge:
+  #   image: browsers/edge:latest
+  #   networks:
+  #     - gwen-net
+  # firefox:
+  #   image: selenoid/firefox:latest
+  #   networks:
+  #     - gwen-net
+  # video-recorder:
+  #   image: selenoid/video-recorder:latest-release
+  #   networks:
+  #     - gwen-net
   selenoid:
     image: aerokube/selenoid:latest-release
     networks:
@@ -25,22 +25,22 @@ services:
     volumes:
       - "$PWD/gwen/browsers:/etc/selenoid/:ro"
       - "/var/run/docker.sock:/var/run/docker.sock"
-      - "$PWD/gwen/output/.video:/opt/selenoid/video"
-    environment:
-      - OVERRIDE_VIDEO_OUTPUT_DIR=$PWD/gwen/output/.video
+      # - "$PWD/gwen/output/.video:/opt/selenoid/video"
+    # environment:
+      # - OVERRIDE_VIDEO_OUTPUT_DIR=$PWD/gwen/output/.video
     command: ["-container-network", "gwen-net", "-video-output-dir", "/opt/selenoid/video"]
-  selenoid-ui:
-    depends_on:
-      - selenoid
-      - $GWEN_BROWSER
-    image: aerokube/selenoid-ui:latest
-    environment:
-      - GWEN_BROWSER
-    networks:
-      - gwen-net
-    ports: 
-      - "8999:8999"
-    command: ["--selenoid-uri", "http://selenoid:4444", "--listen", ":8999"]
+  # selenoid-ui:
+  #   depends_on:
+  #     - selenoid
+  #     - $GWEN_BROWSER
+  #   image: aerokube/selenoid-ui:latest
+  #   environment:
+  #     - GWEN_BROWSER
+  #   networks:
+  #     - gwen-net
+  #   ports: 
+  #     - "8999:8999"
+  #   command: ["--selenoid-uri", "http://selenoid:4444", "--listen", ":8999"]
   gwen:
     depends_on:
       - selenoid
@@ -65,18 +65,18 @@ services:
     command: bash -c "yarn install && yarn gwen -b -c gwen/browsers/selenoid.conf gwen/features"
     networks:
       - gwen-net
-  gwen-dry-run:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    environment:
-      - NO_COLOR
-    volumes:
-      - "$PWD:/project"
-    working_dir: /project
-    command: bash -c "yarn install && yarn gwen -bn --parallel gwen/features"
-    networks:
-      - gwen-net
+  # gwen-dry-run:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   environment:
+  #     - NO_COLOR
+  #   volumes:
+  #     - "$PWD:/project"
+  #   working_dir: /project
+  #   command: bash -c "yarn install && yarn gwen -bn --parallel gwen/features"
+  #   networks:
+  #     - gwen-net
 networks:
   gwen-net:
     name: gwen-net
