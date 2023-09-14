@@ -44,7 +44,7 @@ services:
   gwen:
     depends_on:
       - selenoid
-      - video-recorder
+      # - video-recorder
       - $GWEN_BROWSER
     build:
       context: .
