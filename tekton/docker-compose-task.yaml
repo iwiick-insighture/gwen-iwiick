@@ -15,6 +15,11 @@ spec:
   steps:
     - name: run-docker-compose
       image: docker/compose
+      resources:
+        requests:
+          ephemeral-storage: 4Gi
+        limits:
+          ephemeral-storage: 6Gi
       env:
         # Connect to the sidecar over TCP, with TLS.
         - name: DOCKER_HOST
@@ -29,7 +34,7 @@ spec:
           value: "selenoid"
       script: |
         # Wait for the sidecar to be ready.
-        while ! docker info; do sleep 1; done
+        while ! docker info > /dev/null 2>&1; do sleep 1; done
         cd $(workspaces.output.path)
         mkdir -p gwen/output
         docker-compose -f $(inputs.params.docker-compose-file) $(inputs.params.docker-compose-args)
@@ -38,9 +43,15 @@ spec:
   sidecars:
     - name: docker
       image: docker:dind
+      resources:
+        requests:
+          ephemeral-storage: 4Gi
+        limits:
+          ephemeral-storage: 6Gi
       args:
         - --storage-driver=vfs
-        - --debug
+        - --log-level=fatal
+        # - --debug
       securityContext:
         privileged: true
       env:

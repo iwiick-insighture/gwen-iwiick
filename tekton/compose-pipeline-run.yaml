@@ -5,11 +5,14 @@ metadata:
 spec:
   params:
     - name: gitUrl
-      value: https://github.com/kekayann/gwen
+      value: https://github.com/insighture/gwen
     - name: gitRevision
       value: main
   pipelineRef:
     name: docker-compose-pipeline
+  podTemplate:
+    securityContext:
+      fsGroup: 65532
   workspaces: 
     - name: output
       persistentVolumeClaim:
