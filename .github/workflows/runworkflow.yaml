@@ -56,4 +56,6 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         script: |
           cd /home/ubuntu/gwen
-          
+          mkdir -p gwen/output
+          docker-compose -f gwen/docker-compose.yml build
+          docker-compose -f gwen/docker-compose.yml run gwen
