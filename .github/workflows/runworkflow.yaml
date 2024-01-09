@@ -50,23 +50,24 @@ jobs:
         echo "HOST=$HOSTNAME" >> $GITHUB_ENV
         echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV 
 
-    - name: Install docker on EC2
-      run: |
-        while ! nc -z ${{ env.HOST }} 22; do sleep 10; done
-        ssh -o StrictHostKeyChecking=no -i $HOME/QWENKey.pem ubuntu@${{ env.HOST }} '
-          sudo apt-get update
-          sudo apt-get install -y docker.io
-          sudo systemctl start docker
-          sudo systemctl enable docker
-          sudo groupadd docker
-          sudo usermod -aG docker $USER
-          newgrp docker
-          # docker-compose
-          sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-          sudo chmod +x /usr/local/bin/docker-compose
-        '
+    # - name: Install docker on EC2
+    #   run: |
+    #     while ! nc -z ${{ env.HOST }} 22; do sleep 10; done
+    #     ssh -o StrictHostKeyChecking=no -i $HOME/QWENKey.pem ubuntu@${{ env.HOST }} '
+    #       sudo apt-get update
+    #       sudo apt-get install -y docker.io
+    #       sudo systemctl start docker
+    #       sudo systemctl enable docker
+    #       sudo groupadd docker
+    #       sudo usermod -aG docker $USER
+    #       newgrp docker
+    #       # docker-compose
+    #       sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    #       sudo chmod +x /usr/local/bin/docker-compose
+    #     '
     - name: Copy files to EC2
       run: |
+        ls -la
         scp -o StrictHostKeyChecking=no -i $HOME/QWENKey.pem -r ./ ubuntu@${{ env.HOST }}:/home/ubuntu/gwen 
 
 
