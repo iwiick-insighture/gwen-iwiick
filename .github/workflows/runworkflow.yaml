@@ -28,12 +28,12 @@ jobs:
       id: ssh-key
       run: |
         aws ec2 delete-key-pair --key-name QWENKey || true
-        aws ec2 create-key-pair --key-name QWENKey --query 'KeyMaterial' --output text >> a.txt
-        echo "SSH_KEY=$(cat a.txt | base64)" >> $GITHUB_ENV
+        aws ec2 create-key-pair --key-name QWENKey --query 'KeyMaterial' --output text >> $HOME/a.txt
+        
        
     - name: decode-ssh-key
       run: |
-          echo ${{ env.SSH_KEY }}
+          cat $HOME/a.txt
 
         
     - name: create a spot instance
