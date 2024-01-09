@@ -28,7 +28,8 @@ jobs:
       id: ssh-key
       run: |
         aws ec2 delete-key-pair --key-name QWENKey || true
-        SSH_KEY=$(aws ec2 create-key-pair --key-name QWENKey --query 'KeyMaterial' --output text | base64)
+        aws ec2 create-key-pair --key-name QWENKey --query 'KeyMaterial' --output text >> a.txt
+        cat a.txt
         echo "::set-output name=SSH_KEY::$SSH_KEY"
 
     - name: decode-ssh-key
