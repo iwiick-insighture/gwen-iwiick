@@ -34,7 +34,7 @@ jobs:
         --spot-price "0.05" \
         --instance-count 1 \
         --type "one-time" \
-        --launch-specification '{"ImageId":"ami-0c7217cdde317cfec","InstanceType":"t2.medium","KeyName":"QWENKey"}' \
+        --launch-specification "{\"ImageId\":\"ami-0c7217cdde317cfec\",\"InstanceType\":\"t2.medium\",\"KeyName\":\"QWENKey\"}" \
         --query 'SpotInstanceRequests[0].SpotInstanceRequestId' \
         --output text)"
         aws ec2 wait spot-instance-request-fulfilled --spot-instance-request-ids $REQUEST_ID
