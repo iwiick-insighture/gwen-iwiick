@@ -25,10 +25,10 @@ jobs:
         aws-region: 'us-east-1'
 
     - name: create a ssh key aws
+      id: ssh-key
       run: |
-        SSH_KEY=$($(aws ec2 create-key-pair --key-name QWENKey --query 'KeyMaterial' --output text) | base64 -w 0)
-        echo "SSH_KEY=$SSH_KEY" >> $GITHUB_ENV
-        echo ${{ env.SSH_KEY }}
+        SSH_KEY=$(aws ec2 create-key-pair --key-name QWENKey --query 'KeyMaterial' --output text)
+        echo "SSH_KEY=$SSH_KEY" >> $GITHUB_OUTPUT
         
     - name: create a spot instance
       run: |
@@ -50,7 +50,7 @@ jobs:
       with:
         host: ${{ env.HOST }}
         username: ubuntu
-        key: ${{ env.SSH_KEY }} | base64 -d
+        key: ${{ steps.ssh-key.outputs.SSH_KEY }} 
         script: |
           sudo apt-get update
           sudo apt-get install -y docker.io
@@ -68,7 +68,7 @@ jobs:
       with:
         host: ${{ env.HOST }}
         username: ubuntu
-        key: ${{ env.SSH_KEY }} | base64 -d
+        key: ${{ steps.ssh-key.outputs.SSH_KEY }} 
         source: "."
         target: "/home/ubuntu/gwen"
 
@@ -77,7 +77,7 @@ jobs:
       with:
         host: ${{ env.HOST }}
         username: ubuntu
-        key: ${{ env.SSH_KEY }} | base64 -d
+        key: ${{ steps.ssh-key.outputs.SSH_KEY }} 
         script: |
           cd /home/ubuntu/gwen
           mkdir -p gwen/output
@@ -89,7 +89,7 @@ jobs:
       with:
         host: ${{ env.HOST }}
         username: ubuntu
-        key: ${{ env.SSH_KEY }} | base64 -d
+        key: ${{ steps.ssh-key.outputs.SSH_KEY }} 
         source: "/home/ubuntu/gwen/output"
         target: "."
 
