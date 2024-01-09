@@ -67,8 +67,7 @@ jobs:
     #     '
     - name: Copy files to EC2
       run: |
-        ls -la
-        scp -o StrictHostKeyChecking=no -i $HOME/QWENKey.pem -r ./ ubuntu@${{ env.HOST }}:/home/ubuntu/gwen 
+        scp -o StrictHostKeyChecking=no -i $HOME/QWENKey.pem -r * ubuntu@${{ env.HOST }}:/home/ubuntu/gwen 
 
 
     - name:  Deploy to EC2
