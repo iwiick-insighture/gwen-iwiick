@@ -26,9 +26,8 @@ jobs:
 
     - name: create a ssh key aws
       run: |
-        echo "SSH_KEY=$(aws ec2 create-key-pair --key-name QWENKey --query 'KeyMaterial' --output text)"
-        url_encoded_key=$(printf %s "$key_material" | jq -s -R -r @uri)
-        echo "SSH_KEY=$url_encoded_key" >> $GITHUB_ENV
+        SSH_KEY=$(aws ec2 create-key-pair --key-name QWENKey --query 'KeyMaterial' --output text)
+        echo "SSH_KEY=$SSH_KEY" >> $GITHUB_ENV
         
     - name: create a spot instance
       run: |
