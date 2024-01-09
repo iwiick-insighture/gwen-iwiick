@@ -26,7 +26,7 @@ jobs:
 
     - name: create a ssh key aws
       run: |
-        echo "SSH_KEY=$(aws ec2 create-key-pair --key-name QWENKey --query 'KeyMaterial' --output text)" >> ssh_key.pem
+        echo "SSH_KEY=$(aws ec2 create-key-pair --key-name QWENKey --query 'KeyMaterial' --output text)" >> ./ssh_key.pem
         
     - name: create a spot instance
       run: |
