@@ -34,6 +34,8 @@ jobs:
       run: |
         chmod 600 $HOME/ssh_key
         cat $HOME/ssh_key
+        ls -al $HOME/
+        ls -al ~/
           
     - name: create a spot instance
       run: |
@@ -55,7 +57,7 @@ jobs:
       with:
         host: ${{ env.HOST }}
         username: ubuntu
-        key_path: $HOME/ssh_key
+        key_path: ~/ssh_key
         script: |
           sudo apt-get update
           sudo apt-get install -y docker.io
