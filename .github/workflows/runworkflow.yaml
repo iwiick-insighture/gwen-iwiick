@@ -37,6 +37,7 @@ jobs:
           echo "${{ steps.ssh-key.outputs.SSH_KEY }}" | base64 -d
           echo "${{ steps.ssh-key.outputs.SSH_KEY }}" | base64 -d >> ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          cat ~/.ssh/id_rsa
 
         
     - name: create a spot instance
