@@ -55,7 +55,7 @@ jobs:
       with:
         host: ${{ env.HOST }}
         username: ubuntu
-        key: cat $HOME/ssh_key
+        key:  $(cat $HOME/ssh_key)
         script: |
           sudo apt-get update
           sudo apt-get install -y docker.io
