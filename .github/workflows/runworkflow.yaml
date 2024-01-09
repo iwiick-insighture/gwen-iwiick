@@ -52,7 +52,7 @@ jobs:
       with:
         host: ${{ env.HOST }}
         username: ubuntu
-        key: ${{ steps.ssh-key.outputs.SSH_KEY  }} | base64decode
+        key: ${{ steps.ssh-key.outputs.SSH_KEY | base64decode  }} 
         script: |
           sudo apt-get update
           sudo apt-get install -y docker.io
@@ -70,7 +70,7 @@ jobs:
       with:
         host: ${{ env.HOST }}
         username: ubuntu
-        key: ${{ steps.ssh-key.outputs.SSH_KEY  }} | base64decode 
+        key: ${{ steps.ssh-key.outputs.SSH_KEY | base64decode   }} 
         source: "."
         target: "/home/ubuntu/gwen"
 
@@ -79,7 +79,7 @@ jobs:
       with:
         host: ${{ env.HOST }}
         username: ubuntu
-        key: ${{ steps.ssh-key.outputs.SSH_KEY  }} | base64decode 
+        key: ${{ steps.ssh-key.outputs.SSH_KEY | base64decode   }} 
         script: |
           cd /home/ubuntu/gwen
           mkdir -p gwen/output
@@ -91,7 +91,7 @@ jobs:
       with:
         host: ${{ env.HOST }}
         username: ubuntu
-        key: ${{ steps.ssh-key.outputs.SSH_KEY  }} | base64decode 
+        key: ${{ steps.ssh-key.outputs.SSH_KEY | base64decode  }}  
         source: "/home/ubuntu/gwen/output"
         target: "."
 
