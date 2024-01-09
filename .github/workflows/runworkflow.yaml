@@ -27,8 +27,9 @@ jobs:
     - name: create a ssh key aws
       id: ssh-key
       run: |
+        aws ec2 delete-key-pair --key-name QWENKey || true
         SSH_KEY=$(aws ec2 create-key-pair --key-name QWENKey --query 'KeyMaterial' --output text)
-        echo "SSH_KEY=$SSH_KEY" >> $GITHUB_OUTPUT
+        echo "::set-output name=SSH_KEY::$SSH_KEY"
 
         
     - name: create a spot instance
