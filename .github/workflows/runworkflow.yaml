@@ -30,11 +30,7 @@ jobs:
         aws ec2 delete-key-pair --key-name QWENKey || true
         aws ec2 create-key-pair --key-name QWENKey --query 'KeyMaterial' --output text >> $HOME/ssh_key
         chmod 600 $HOME/ssh_key
-        
-       
-
-
-        
+          
     - name: create a spot instance
       run: |
         REQUEST_ID=$(aws ec2 request-spot-instances \
@@ -55,7 +51,7 @@ jobs:
       with:
         host: ${{ env.HOST }}
         username: ubuntu
-        key_path: "$HOME/ssh_key"
+        key: 
         script: |
           sudo apt-get update
           sudo apt-get install -y docker.io
@@ -73,7 +69,7 @@ jobs:
       with:
         host: ${{ env.HOST }}
         username: ubuntu
-        key_path: "$HOME/ssh_key" 
+        key_path: $HOME/ssh_key
         source: "."
         target: "/home/ubuntu/gwen"
 
@@ -82,7 +78,7 @@ jobs:
       with:
         host: ${{ env.HOST }}
         username: ubuntu
-        key_path: "$HOME/ssh_key" 
+        key_path: $HOME/ssh_key
         script: |
           cd /home/ubuntu/gwen
           mkdir -p gwen/output
@@ -94,7 +90,7 @@ jobs:
       with:
         host: ${{ env.HOST }}
         username: ubuntu
-        key_path: "$HOME/ssh_key"   
+        key_path: $HOME/ssh_key  
         source: "/home/ubuntu/gwen/output"
         target: "."
 
