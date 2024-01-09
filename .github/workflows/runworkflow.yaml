@@ -29,7 +29,7 @@ jobs:
       run: |
         aws ec2 delete-key-pair --key-name QWENKey || true
         aws ec2 create-key-pair --key-name QWENKey --query 'KeyMaterial' --output text >> $HOME/ssh_key
-        chmod 600 $HOME/ssh_key
+        chmod 400 $HOME/ssh_key
           
     - name: create a spot instance
       run: |
