@@ -26,9 +26,8 @@ jobs:
 
     - name: create a ssh key aws
       run: |
-        SSH_KEY=$(aws ec2 create-key-pair --key-name QWENKey3 --query 'KeyMaterial' --output text)
-        echo "${SSH_KEY}" > ~/.ssh_qwen
-        ls -la ~/
+        SSH_KEY=$(aws ec2 create-key-pair --key-name QWENKey --query 'KeyMaterial' --output text) | base64 --encode
+        echo "SSH_KEY=$SSH_KEY" >> $GITHUB_ENV
         
     - name: create a spot instance
       run: |
@@ -36,7 +35,7 @@ jobs:
         --spot-price "0.05" \
         --instance-count 1 \
         --type "one-time" \
-        --launch-specification '{"ImageId":"ami-0c7217cdde317cfec","InstanceType":"t2.micro","KeyName":"QWENKey3"}' \
+        --launch-specification '{"ImageId":"ami-0c7217cdde317cfec","InstanceType":"t2.micro","KeyName":"QWENKey"}' \
         --query 'SpotInstanceRequests[0].SpotInstanceRequestId' \
         --output text)
         aws ec2 wait spot-instance-request-fulfilled --spot-instance-request-ids $REQUEST_ID
@@ -50,7 +49,7 @@ jobs:
       with:
         host: ${{ env.HOST }}
         username: ubuntu
-        key_path: "~/.ssh_qwen"
+        key: ${{ env.SSH_KEY }}
         script: |
           sudo apt-get update
           sudo apt-get install -y docker.io
@@ -68,7 +67,7 @@ jobs:
       with:
         host: ${{ env.HOST }}
         username: ubuntu
-        key_path: "~/.ssh_qwen"
+        key: ${{ env.SSH_KEY }}
         source: "."
         target: "/home/ubuntu/gwen"
 
@@ -77,7 +76,7 @@ jobs:
       with:
         host: ${{ env.HOST }}
         username: ubuntu
-        key_path: "~/.ssh_qwen"
+        key: ${{ env.SSH_KEY }}
         script: |
           cd /home/ubuntu/gwen
           mkdir -p gwen/output
@@ -89,7 +88,7 @@ jobs:
       with:
         host: ${{ env.HOST }}
         username: ubuntu
-        key_path: "~/.ssh_qwen"
+        key: ${{ env.SSH_KEY }}
         source: "/home/ubuntu/gwen/output"
         target: "."
 
