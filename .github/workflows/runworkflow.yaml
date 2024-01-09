@@ -28,12 +28,12 @@ jobs:
       id: ssh-key
       run: |
         aws ec2 delete-key-pair --key-name QWENKey || true
-        aws ec2 create-key-pair --key-name QWENKey --query 'KeyMaterial' --output text >> /home/runner/work/QWENKey.pem
+        aws ec2 create-key-pair --key-name QWENKey --query 'KeyMaterial' --output text >> $HOME/QWENKey.pem
     
     - name: set permission
       run: |
-        chmod 600 /home/runner/work/QWENKey.pem
-        cat /home/runner/work/QWENKey.pem
+        chmod 600 $HOME/QWENKey.pem
+        cat $HOME/QWENKey.pem
           
     - name: create a spot instance
       run: |
@@ -50,12 +50,19 @@ jobs:
         echo "HOST=$HOSTNAME" >> $GITHUB_ENV
         echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV 
 
+    - name: Wait for SSH to be available
+      run: |
+        while ! nc -z ${{ env.HOST }} 22; do sleep 10; done
+        ssh -o StrictHostKeyChecking=no -i $HOME/QWENKey.pem ubuntu@${{ env.HOST }} '
+          ls -la ~/
+        '
+
     - name: Execute commands on EC2
       uses: appleboy/ssh-action@master
       with:
         host: ${{ env.HOST }}
         username: ubuntu
-        key_path:  /home/runner/work/QWENKey.pem
+        key_path:  $HOME/QWENKey.pem
         script: |
           sudo apt-get update
           sudo apt-get install -y docker.io
