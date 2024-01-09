@@ -26,9 +26,9 @@ jobs:
 
     - name: create a ssh key aws
       run: |
-        SSH_KEY=$(aws ec2 create-key-pair --key-name QWENKey2 --query 'KeyMaterial' --output text)
+        SSH_KEY=$(aws ec2 create-key-pair --key-name QWENKey3 --query 'KeyMaterial' --output text)
         echo "${SSH_KEY}" > ~/.ssh_qwen
-        ls -l ~/
+        ls -la ~/
         
     - name: create a spot instance
       run: |
@@ -36,7 +36,7 @@ jobs:
         --spot-price "0.05" \
         --instance-count 1 \
         --type "one-time" \
-        --launch-specification '{"ImageId":"ami-0c7217cdde317cfec","InstanceType":"t2.micro","KeyName":"QWENKey"}' \
+        --launch-specification '{"ImageId":"ami-0c7217cdde317cfec","InstanceType":"t2.micro","KeyName":"QWENKey3"}' \
         --query 'SpotInstanceRequests[0].SpotInstanceRequestId' \
         --output text)
         aws ec2 wait spot-instance-request-fulfilled --spot-instance-request-ids $REQUEST_ID
