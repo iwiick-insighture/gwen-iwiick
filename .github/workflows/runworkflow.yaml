@@ -26,8 +26,7 @@ jobs:
 
     - name: create a ssh key aws
       run: |
-        SSH_KEY=$(aws ec2 create-key-pair --key-name QWENKey --query 'KeyMaterial' --output text) | base64
-        echo $SSH_KEY
+        SSH_KEY=$($(aws ec2 create-key-pair --key-name QWENKey --query 'KeyMaterial' --output text) | base64 -w 0)
         echo "SSH_KEY=$SSH_KEY" >> $GITHUB_ENV
         echo ${{ env.SSH_KEY }}
         
