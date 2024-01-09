@@ -31,6 +31,11 @@ jobs:
         SSH_KEY=$(aws ec2 create-key-pair --key-name QWENKey --query 'KeyMaterial' --output text | base64)
         echo "::set-output name=SSH_KEY::$SSH_KEY"
 
+    - name: decode-ssh-key
+      run: |
+          echo "${{ steps.ssh-key.outputs.SSH_KEY }}" | base64 -d > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
         
     - name: create a spot instance
       run: |
@@ -52,7 +57,7 @@ jobs:
       with:
         host: ${{ env.HOST }}
         username: ubuntu
-        key: ${{ steps.ssh-key.outputs.SSH_KEY | base64decode  }} 
+        key_path: "~/.ssh/id_rsa"
         script: |
           sudo apt-get update
           sudo apt-get install -y docker.io
@@ -70,7 +75,7 @@ jobs:
       with:
         host: ${{ env.HOST }}
         username: ubuntu
-        key: ${{ steps.ssh-key.outputs.SSH_KEY | base64decode   }} 
+        key_path: "~/.ssh/id_rsa" 
         source: "."
         target: "/home/ubuntu/gwen"
 
@@ -79,7 +84,7 @@ jobs:
       with:
         host: ${{ env.HOST }}
         username: ubuntu
-        key: ${{ steps.ssh-key.outputs.SSH_KEY | base64decode   }} 
+        key_path: "~/.ssh/id_rsa" 
         script: |
           cd /home/ubuntu/gwen
           mkdir -p gwen/output
@@ -91,7 +96,7 @@ jobs:
       with:
         host: ${{ env.HOST }}
         username: ubuntu
-        key: ${{ steps.ssh-key.outputs.SSH_KEY | base64decode  }}  
+        key_path: "~/.ssh/id_rsa"   
         source: "/home/ubuntu/gwen/output"
         target: "."
 
