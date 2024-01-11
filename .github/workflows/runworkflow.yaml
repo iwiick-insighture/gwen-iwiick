@@ -24,7 +24,7 @@ jobs:
     #     role-session-name: OIDCSession
     #     aws-region: 'us-east-1'
         
-    - name: create a ssh key aws
+    - name: create a ssh key awsq
       run: |
         ls -la
 
