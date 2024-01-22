@@ -68,6 +68,11 @@ jobs:
           echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r
           'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo
           "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
+      - name: Install jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+          
       - name: Get latest Docker Compose version
         run: |
           DOCKER_COMPOSE_VERSION=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | jq -r .tag_name)
