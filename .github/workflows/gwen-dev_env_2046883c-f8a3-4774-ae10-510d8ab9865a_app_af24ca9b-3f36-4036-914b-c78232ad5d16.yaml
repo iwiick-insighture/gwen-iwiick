@@ -22,6 +22,8 @@ jobs:
     name: Start Runner
     permissions: write-all
     runs-on: ubuntu-latest
+    container:
+      image: lucasalt/act_base:latest
     outputs:
       label: ${{ steps.start-ec2-runner.outputs.label }}
       ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
@@ -68,24 +70,6 @@ jobs:
           echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r
           'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo
           "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
-      - name: Install jq
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y jq
-          
-      - name: Get latest Docker Compose version
-        run: |
-          DOCKER_COMPOSE_VERSION=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | jq -r .tag_name)
-
-      - name: Download Docker Compose
-        run: |
-          sudo curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-
-      - name: Verify Docker Compose installation
-        run: |
-          ls -l /usr/local/bin/docker-compose
-          sudo chmod +x /usr/local/bin/docker-compose
-          docker-compose --version
           
       - name: 'Run :: Build With Docker'
         run: >-
