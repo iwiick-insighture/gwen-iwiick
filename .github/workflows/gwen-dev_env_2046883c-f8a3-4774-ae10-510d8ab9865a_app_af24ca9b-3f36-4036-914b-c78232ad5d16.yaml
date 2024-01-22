@@ -1,0 +1,101 @@
+name: >-
+  gwen-dev_env_2046883c-f8a3-4774-ae10-510d8ab9865a_app_af24ca9b-3f36-4036-914b-c78232ad5d16
+  Pipeline (Skyu Generated)
+'on':
+  push:
+    branches:
+      - main
+  workflow_dispatch: {}
+  repository_dispatch:
+    types: pipeline_4db86d22-2462-4e96-8850-4ea5ca1630a0
+env:
+  ENCODED_PIPELINE_SECRET: >-
+    ${{secrets.GWENIWIICK_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16_GWENDEV_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16}}
+  EC2_INSTANCE_TYPE: t3.micro
+  EC2_IMAGE_ID: ami-0c7217cdde317cfec
+  EC2_SUBNET_ID: subnet-0511e49f8669e4d30
+  EC2_SECURITY_GROUP_ID: sg-0244f2edb7af33703
+  DOCKER_COMPOSE_FILE_PATH: gwen/docker-compose.yml
+  IMAGE_TAG: ${{github.event.client_payload.commitId || github.sha}}
+jobs:
+  start-runner:
+    name: Start Runner
+    permissions: write-all
+    runs-on: ubuntu-latest
+    outputs:
+      label: ${{ steps.start-ec2-runner.outputs.label }}
+      ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
+    steps:
+      - name: 'Run :: Decoding Secrets f693d078-aeca-468f-9cfa-8dcbb57e033a'
+        run: >-
+          echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r
+          'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo
+          "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
+      - name: 'Run :: Configure AWS credentials 8de50970-a06b-4d8f-a3da-616d9ea90ebb'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.roleARN }}
+          role-session-name: skyu-pipeline-assume-role-session
+          aws-region: ${{ env.region }}
+      - name: 'Run :: Start EC2 Runner'
+        id: start-ec2-runner
+        uses: machulav/ec2-github-runner@v2
+        with:
+          mode: start
+          github-token: ${{ env.pat }}
+          ec2-instance-type: ${{ env.EC2_INSTANCE_TYPE }}
+          ec2-image-id: ${{ env.EC2_IMAGE_ID }}
+          subnet-id: ${{ env.EC2_SUBNET_ID }}
+          security-group-id: ${{ env.EC2_SECURITY_GROUP_ID }}
+  gwen-job:
+    name: Gwen Job
+    permissions: write-all
+    runs-on: ${{ needs.start-runner.outputs.label }}
+    needs:
+      - start-runner
+    steps:
+      - name: Start
+        run: >-
+          echo " Starting GitHub Action!" && echo "IMAGE_EXISTS_IN_ECR=false" >>
+          $GITHUB_ENV
+      - name: 'Run :: Checkout repository'
+        uses: actions/checkout@v2
+      - name: 'Run :: Checkout Specific Commit'
+        if: ${{ github.event.client_payload.commitId != null }}
+        run: git checkout ${{ github.event.client_payload.commitId }}
+      - name: 'Run :: Decoding Secrets f2ea5b05-a6a3-41f8-8dd3-f4023b401409'
+        run: >-
+          echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r
+          'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo
+          "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
+      - name: 'Run :: Build With Docker'
+        run: >-
+          docker-compose -f ${{env.DOCKER_COMPOSE_FILE_PATH}} build &&
+          docker-compose -f ${{env.DOCKER_COMPOSE_FILE_PATH}} up -d
+  stop-runner:
+    name: Stop Runner
+    permissions: write-all
+    runs-on: ubuntu-latest
+    needs:
+      - start-runner
+      - gwen-job
+    if: ${{ always() }}
+    steps:
+      - name: 'Run :: Decoding Secrets c64599c8-d7cf-4936-b229-a4984693e644'
+        run: >-
+          echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r
+          'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo
+          "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
+      - name: 'Run :: Configure AWS credentials 046becd7-52af-41a4-a16c-7f709876122f'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.roleARN }}
+          role-session-name: skyu-pipeline-assume-role-session
+          aws-region: ${{ env.region }}
+      - name: 'Run :: Stop EC2 Runner'
+        uses: machulav/ec2-github-runner@v2
+        with:
+          mode: stop
+          github-token: ${{ env.pat }}
+          label: ${{ needs.start-runner.outputs.label }}
+          ec2-instance-id: ${{ needs.start-runner.outputs.ec2-instance-id }}
