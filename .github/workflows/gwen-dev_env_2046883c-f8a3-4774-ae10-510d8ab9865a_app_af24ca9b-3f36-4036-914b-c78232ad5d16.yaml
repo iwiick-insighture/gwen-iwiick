@@ -7,7 +7,7 @@ name: >-
       - main
   workflow_dispatch: {}
   repository_dispatch:
-    types: pipeline_6236dd8a-bc4d-441d-b5bc-6d8da7fe64e3
+    types: pipeline_bc610956-9693-470b-821a-2b8d292deab9
 env:
   ENCODED_PIPELINE_SECRET: >-
     ${{secrets.GWENIWIICK_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16_GWENDEV_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16}}
@@ -22,13 +22,11 @@ jobs:
     name: Start Runner
     permissions: write-all
     runs-on: ubuntu-latest
-    container:
-      image: lucasalt/act_base:latest
     outputs:
       label: ${{ steps.start-ec2-runner.outputs.label }}
       ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
     steps:
-      - name: 'Run :: Decoding Secrets 19c7dcbc-00be-4a92-9384-2ab376c4cc85'
+      - name: 'Run :: Decoding Secrets 2704c56d-4630-43a1-8d17-c9b4a7e1f9c3'
         run: |2-
 
                   if ! command -v jq &> /dev/null; then
@@ -41,7 +39,7 @@ jobs:
                     echo "::add-mask::${line#*=}"
                   done
                 
-      - name: 'Run :: Configure AWS credentials 117c8f9d-248d-4ec3-b8b0-91b8c4fbf4bb'
+      - name: 'Run :: Configure AWS credentials 3649ff30-fb74-47db-bea8-7a90237d08bc'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
@@ -73,7 +71,7 @@ jobs:
       - name: 'Run :: Checkout Specific Commit'
         if: ${{ github.event.client_payload.commitId != null }}
         run: git checkout ${{ github.event.client_payload.commitId }}
-      - name: 'Run :: Decoding Secrets d5bb58b2-41eb-48ee-bf9a-a49a22036dc5'
+      - name: 'Run :: Decoding Secrets 16b414fa-dcd8-4078-bd85-1f766ccc93cc'
         run: |2-
 
                   if ! command -v jq &> /dev/null; then
@@ -99,7 +97,7 @@ jobs:
       - gwen-job
     if: ${{ always() }}
     steps:
-      - name: 'Run :: Decoding Secrets 6e0ebad4-7661-426a-94ce-97d7342b2f68'
+      - name: 'Run :: Decoding Secrets 3154739a-2721-4baa-b354-e30ee0b53778'
         run: |2-
 
                   if ! command -v jq &> /dev/null; then
@@ -112,7 +110,7 @@ jobs:
                     echo "::add-mask::${line#*=}"
                   done
                 
-      - name: 'Run :: Configure AWS credentials 44d2c7f3-d000-4712-bb06-de9725615894'
+      - name: 'Run :: Configure AWS credentials 662e8a7b-caa1-4277-9e2d-c6adaa0236f0'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
