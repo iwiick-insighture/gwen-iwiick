@@ -7,7 +7,7 @@ name: >-
       - main
   workflow_dispatch: {}
   repository_dispatch:
-    types: pipeline_b84fb3e6-d292-44df-9aae-272d42fb5414
+    types: pipeline_26bf93b5-2f0d-4596-bd75-4c69f5dc05bf
 env:
   ENCODED_PIPELINE_SECRET: >-
     ${{secrets.GWENIWIICK_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16_GWENDEV_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16}}
@@ -26,12 +26,12 @@ jobs:
       label: ${{ steps.start-ec2-runner.outputs.label }}
       ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
     steps:
-      - name: 'Run :: Decoding Secrets e627263d-138c-44ce-ab23-29a478f90b5b'
+      - name: 'Run :: Decoding Secrets 7a456bc5-0b27-4505-ae7d-84a37d349b97'
         run: >-
           echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r
           'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo
           "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
-      - name: 'Run :: Configure AWS credentials 515bde94-b942-4f4d-b6c8-08ef66ecd82b'
+      - name: 'Run :: Configure AWS credentials 05cfbfe6-dc56-4bbe-bf89-f6ec5bccddab'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
@@ -63,7 +63,7 @@ jobs:
       - name: 'Run :: Checkout Specific Commit'
         if: ${{ github.event.client_payload.commitId != null }}
         run: git checkout ${{ github.event.client_payload.commitId }}
-      - name: 'Run :: Decoding Secrets 73dc2072-2a26-4f5f-b794-feb3ae3248d4'
+      - name: 'Run :: Decoding Secrets 747fc621-5496-4e95-a4cf-e14128f3cce2'
         run: >-
           echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r
           'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo
@@ -80,8 +80,11 @@ jobs:
           ------------- Running Docker Compose -------------
           " &&
               docker-compose -f ${{env.DOCKER_COMPOSE_FILE_PATH}} build && docker-compose -f ${{env.DOCKER_COMPOSE_FILE_PATH}} up -d
-      - name: 'Run :: GWEN'
-        run: gwen
+      - name: 'Run :: Gwen'
+        run: |2-
+
+              docker-compose -f ${{env.DOCKER_COMPOSE_FILE_PATH}} run gwen
+              
   stop-runner:
     name: Stop Runner
     permissions: write-all
@@ -91,12 +94,12 @@ jobs:
       - gwen-job
     if: ${{ always() }}
     steps:
-      - name: 'Run :: Decoding Secrets 3268542f-7c95-4f8a-ac85-7648a12fcbe5'
+      - name: 'Run :: Decoding Secrets 3afeb048-98b4-41ee-8043-84355864eef0'
         run: >-
           echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r
           'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo
           "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
-      - name: 'Run :: Configure AWS credentials f4af398f-8a88-4a6a-8ae9-614ec83b8e88'
+      - name: 'Run :: Configure AWS credentials bba9ba38-dfb2-412d-9f0a-83767f69d23c'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
