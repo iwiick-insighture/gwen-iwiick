@@ -7,7 +7,7 @@ name: >-
       - main
   workflow_dispatch: {}
   repository_dispatch:
-    types: pipeline_bc610956-9693-470b-821a-2b8d292deab9
+    types: pipeline_2a4b72ac-67b3-4c4e-a599-c85dd65695b8
 env:
   ENCODED_PIPELINE_SECRET: >-
     ${{secrets.GWENIWIICK_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16_GWENDEV_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16}}
@@ -26,20 +26,12 @@ jobs:
       label: ${{ steps.start-ec2-runner.outputs.label }}
       ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
     steps:
-      - name: 'Run :: Decoding Secrets 2704c56d-4630-43a1-8d17-c9b4a7e1f9c3'
-        run: |2-
-
-                  if ! command -v jq &> /dev/null; then
-                    echo "jq is not installed. Installing it..."
-                    sudo apt-get update
-                    sudo apt-get install -y jq
-                  fi
-                  echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do
-                    echo "$line" >> $GITHUB_ENV
-                    echo "::add-mask::${line#*=}"
-                  done
-                
-      - name: 'Run :: Configure AWS credentials 3649ff30-fb74-47db-bea8-7a90237d08bc'
+      - name: 'Run :: Decoding Secrets 4483729c-f191-4a71-804e-20d449b09eab'
+        run: >-
+          echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r
+          'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo
+          "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
+      - name: 'Run :: Configure AWS credentials 7373ada9-627f-4e43-9ba0-c689dd5a99c4'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
@@ -71,23 +63,17 @@ jobs:
       - name: 'Run :: Checkout Specific Commit'
         if: ${{ github.event.client_payload.commitId != null }}
         run: git checkout ${{ github.event.client_payload.commitId }}
-      - name: 'Run :: Decoding Secrets 16b414fa-dcd8-4078-bd85-1f766ccc93cc'
+      - name: 'Run :: Decoding Secrets 58fec587-3b41-401c-8865-aa44f9926b6d'
+        run: >-
+          echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r
+          'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo
+          "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
+      - name: 'Run :: Build With Docker'
         run: |2-
 
-                  if ! command -v jq &> /dev/null; then
-                    echo "jq is not installed. Installing it..."
-                    sudo apt-get update
-                    sudo apt-get install -y jq
-                  fi
-                  echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do
-                    echo "$line" >> $GITHUB_ENV
-                    echo "::add-mask::${line#*=}"
-                  done
-                
-      - name: 'Run :: Build With Docker'
-        run: >-
-          docker-compose -f ${{env.DOCKER_COMPOSE_FILE_PATH}} build &&
-          docker-compose -f ${{env.DOCKER_COMPOSE_FILE_PATH}} up -d
+              sudo apt update && 
+              sudo apt install -y docker-compose && 
+              docker-compose -f ${{env.DOCKER_COMPOSE_FILE_PATH}} build && docker-compose -f ${{env.DOCKER_COMPOSE_FILE_PATH}} up -d
   stop-runner:
     name: Stop Runner
     permissions: write-all
@@ -97,20 +83,12 @@ jobs:
       - gwen-job
     if: ${{ always() }}
     steps:
-      - name: 'Run :: Decoding Secrets 3154739a-2721-4baa-b354-e30ee0b53778'
-        run: |2-
-
-                  if ! command -v jq &> /dev/null; then
-                    echo "jq is not installed. Installing it..."
-                    sudo apt-get update
-                    sudo apt-get install -y jq
-                  fi
-                  echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do
-                    echo "$line" >> $GITHUB_ENV
-                    echo "::add-mask::${line#*=}"
-                  done
-                
-      - name: 'Run :: Configure AWS credentials 662e8a7b-caa1-4277-9e2d-c6adaa0236f0'
+      - name: 'Run :: Decoding Secrets f972f11e-53ff-4713-a709-88742cd317ef'
+        run: >-
+          echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r
+          'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo
+          "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
+      - name: 'Run :: Configure AWS credentials 1b203cc1-de13-4c0a-be1f-97d591f380b9'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
