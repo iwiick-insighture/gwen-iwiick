@@ -7,7 +7,7 @@ name: >-
       - main
   workflow_dispatch: {}
   repository_dispatch:
-    types: pipeline_1e10486b-e563-4868-8882-b52b01c3f06e
+    types: pipeline_0ac051f2-bc94-46be-ae0a-38463ed67532
 env:
   ENCODED_PIPELINE_SECRET: >-
     ${{secrets.GWENIWIICK_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16_GWENDEV_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16}}
@@ -27,7 +27,7 @@ jobs:
       label: ${{ steps.start-ec2-runner.outputs.label }}
       ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
     steps:
-      - name: 'Run :: Decoding Secrets 5ae07a11-c08e-4777-bb2b-6fae45d59f1c'
+      - name: 'Run :: Decoding Secrets bc9d60b4-b0a4-44cb-a36e-d3fb74861ac9'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -37,7 +37,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials 68e6eed3-1402-4a99-9de3-8ebf74c5141b'
+      - name: 'Run :: Configure AWS credentials 4fd9f2c9-4663-4873-bdeb-04088ef5f879'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
@@ -69,7 +69,7 @@ jobs:
       - name: 'Run :: Checkout Specific Commit'
         if: ${{ github.event.client_payload.commitId != null }}
         run: git checkout ${{ github.event.client_payload.commitId }}
-      - name: 'Run :: Decoding Secrets f8ded53c-c744-4423-9bb6-056f1a9e24e9'
+      - name: 'Run :: Decoding Secrets ace80d62-9384-4fd9-b669-190592a91b3a'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -93,20 +93,8 @@ jobs:
               docker-compose -f ${{env.DOCKER_COMPOSE_FILE_PATH}} run gwen &&
               docker-compose -f ${{env.DOCKER_COMPOSE_FILE_PATH}} down -v
               
-      - name: 'Run :: Upload Gwen Results To S3'
-        run: |2-
-
-              ls -R ./gwen/output/reports/html
-
-              response=$(curl -X POST ${{ env.S3_UPLOAD_ENDPOINT }} -H "Authorization: ${{ env.SERVICE_ACC_ACCESS_TOKEN }}" -H "x-auth-by: sa" -H "x-organization-id: ${{ env.DEPLOYMENT_ORGANIZATION_ID }}" -H "x-project-id: ${{ env.DEPLOYMENT_PROJECT_ID }}" -H "x-environment-id: ${{ env.DEPLOYMENT_ENVIRONMENT_ID }}" -H "x-resource-id: ${{ env.DEPLOYMENT_APPLICATION_ID }}" -H "Content-Type: multipart/form-data" -F "file=@./gwen/output/reports/html/index.html" -F "provider=aws" -F "resourceType=gwen-output" -F "cloudStoragePath=/${{ env.DEPLOYMENT_APPLICATION_ID }}/gwen_outputs/${{ env.IMAGE_TAG }}/")
-
-              if echo "$response" | grep -q '"success":true'; then
-                echo "SUCCESS :: $response"
-              else
-                echo "FAILED :: $response"
-              fi
-              
-        if: ${{ env.IMAGE_EXISTS_IN_ECR == 'false' }}
+      - name: 'Run :: Sync Gwen Results to S3 bucket'
+        run: aws s3 sync ./gwen/output/reports ${{ env.WEB_APP_S3_SYNC_URL }}
       - name: 'Run :: Deploy and Notify Resource Service'
         run: |2-
 
@@ -134,7 +122,7 @@ jobs:
       - gwen-job
     if: ${{ always() }}
     steps:
-      - name: 'Run :: Decoding Secrets f7673ea7-7978-4cf0-8159-2d885d7f7a97'
+      - name: 'Run :: Decoding Secrets f1bc5c6a-20a5-49bb-8ee0-5c2d9b5bd556'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -144,7 +132,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials d522ebac-6d8f-4e52-879e-ad6daf462151'
+      - name: 'Run :: Configure AWS credentials 949053fe-5f98-4f23-942f-14aa9cd8fbe6'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
