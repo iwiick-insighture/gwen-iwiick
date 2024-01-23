@@ -90,7 +90,7 @@ jobs:
       - name: 'Run :: Gwen'
         run: |2-
 
-              docker-compose -f ${{env.DOCKER_COMPOSE_FILE_PATH}} run gwen
+              docker-compose -f ${{env.DOCKER_COMPOSE_FILE_PATH}} run gwen yarn cache clean
               
       - name: 'Run :: Upload Gwen Results To S3'
         run: |2-
