@@ -88,6 +88,8 @@ jobs:
           role-to-assume: ${{ env.roleARN }}
           role-session-name: skyu-pipeline-assume-role-session
           aws-region: ${{ env.region }}
+      - name: 'Run :: Checking AWS version'
+        run: aws --version
       - name: 'Run :: Docker Compose'
         run: |2-
 
