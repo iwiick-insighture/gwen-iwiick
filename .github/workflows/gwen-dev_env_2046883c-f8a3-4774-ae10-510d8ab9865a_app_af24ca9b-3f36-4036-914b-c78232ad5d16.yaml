@@ -99,7 +99,7 @@ jobs:
       - name: 'Run :: Gwen'
         run: |2-
 
-              docker-compose -f ${{env.DOCKER_COMPOSE_FILE_PATH}} run gwen aws --version
+              docker-compose -f ${{env.DOCKER_COMPOSE_FILE_PATH}} run gwen && aws --version
               docker-compose -f ${{env.DOCKER_COMPOSE_FILE_PATH}} down -v
               
       - name: 'Run :: Sync Gwen Results to S3 bucket'
