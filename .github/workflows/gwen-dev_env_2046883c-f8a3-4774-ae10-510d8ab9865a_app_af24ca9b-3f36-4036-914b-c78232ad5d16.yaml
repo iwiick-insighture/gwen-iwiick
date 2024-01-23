@@ -7,7 +7,7 @@ name: >-
       - main
   workflow_dispatch: {}
   repository_dispatch:
-    types: pipeline_d7259207-57c0-4182-9359-561cd78e25ec
+    types: pipeline_6cb1da8f-97d9-4e6b-9468-a979c003f661
 env:
   ENCODED_PIPELINE_SECRET: >-
     ${{secrets.GWENIWIICK_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16_GWENDEV_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16}}
@@ -16,9 +16,6 @@ env:
   EC2_SUBNET_ID: subnet-0511e49f8669e4d30
   EC2_SECURITY_GROUP_ID: sg-0244f2edb7af33703
   IMAGE_TAG: ${{github.event.client_payload.commitId || github.sha}}
-  WEB_APP_S3_SYNC_URL: >-
-    s3://skyu-dev-cicd-reports/org_9f875a32-727f-4fb0-aeb6-ad3b32168642/project_88e61e3d-8f14-4fe8-b600-517e8138c28d/app_af24ca9b-3f36-4036-914b-c78232ad5d16/gwen_outputs/${{github.event.client_payload.commitId
-    || github.sha}}
   DOCKER_COMPOSE_FILE_PATH: gwen/docker-compose.yml
   DEPLOY_STEP_SHOULD_DEPLOY: 'true'
 jobs:
@@ -30,7 +27,7 @@ jobs:
       label: ${{ steps.start-ec2-runner.outputs.label }}
       ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
     steps:
-      - name: 'Run :: Decoding Secrets b5c56a07-3c04-4705-99bd-452ab646eb17'
+      - name: 'Run :: Decoding Secrets 2b15a6b7-0210-43a2-8137-7932e4c78ba9'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -40,12 +37,31 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials 88f87922-2f21-4346-9a67-754a72401cd3'
+      - name: 'Run :: Configure AWS credentials d01802e5-9942-4c91-8503-81058955a494'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
           role-session-name: skyu-pipeline-assume-role-session
           aws-region: ${{ env.region }}
+        run: |2-
+
+                # Check if AWS CLI is installed
+                if ! command -v aws &> /dev/null
+                then
+                    # Install AWS CLI using package manager (e.g., apt or yum)
+                    if command -v apt-get &> /dev/null
+                    then
+                        sudo apt-get update
+                        sudo apt-get install -y awscli
+                    elif command -v yum &> /dev/null
+                    then
+                        sudo yum install -y aws-cli
+                    else
+                        echo "Unsupported package manager. Please install AWS CLI manually."
+                        exit 1
+                    fi
+                fi
+                
       - name: 'Run :: Start EC2 Runner'
         id: start-ec2-runner
         uses: machulav/ec2-github-runner@v2
@@ -72,7 +88,7 @@ jobs:
       - name: 'Run :: Checkout Specific Commit'
         if: ${{ github.event.client_payload.commitId != null }}
         run: git checkout ${{ github.event.client_payload.commitId }}
-      - name: 'Run :: Decoding Secrets 29196518-57b3-43df-b3a3-8a322af6dc2d'
+      - name: 'Run :: Decoding Secrets 0303ef34-f60f-486c-8970-46013d293a7d'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -82,12 +98,31 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials 789c45ba-d1ab-4967-a0b2-2fe935ca8590'
+      - name: 'Run :: Configure AWS credentials 1e2d0906-e728-4d3e-9329-5a1b1cca6b9e'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
           role-session-name: skyu-pipeline-assume-role-session
           aws-region: ${{ env.region }}
+        run: |2-
+
+                # Check if AWS CLI is installed
+                if ! command -v aws &> /dev/null
+                then
+                    # Install AWS CLI using package manager (e.g., apt or yum)
+                    if command -v apt-get &> /dev/null
+                    then
+                        sudo apt-get update
+                        sudo apt-get install -y awscli
+                    elif command -v yum &> /dev/null
+                    then
+                        sudo yum install -y aws-cli
+                    else
+                        echo "Unsupported package manager. Please install AWS CLI manually."
+                        exit 1
+                    fi
+                fi
+                
       - name: 'Run :: Docker Compose'
         run: |2-
 
@@ -131,7 +166,7 @@ jobs:
       - gwen-job
     if: ${{ always() }}
     steps:
-      - name: 'Run :: Decoding Secrets bfd167e4-c3c3-4fef-b881-0a77e1d6957e'
+      - name: 'Run :: Decoding Secrets 7ccbd56e-db45-412a-b522-ad7428aa69e9'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -141,12 +176,31 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials 5acf7c91-4c5c-4bf5-9f9c-45a1da9ef7da'
+      - name: 'Run :: Configure AWS credentials f1f75353-e9f0-45bd-be2a-e15b89e2657e'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
           role-session-name: skyu-pipeline-assume-role-session
           aws-region: ${{ env.region }}
+        run: |2-
+
+                # Check if AWS CLI is installed
+                if ! command -v aws &> /dev/null
+                then
+                    # Install AWS CLI using package manager (e.g., apt or yum)
+                    if command -v apt-get &> /dev/null
+                    then
+                        sudo apt-get update
+                        sudo apt-get install -y awscli
+                    elif command -v yum &> /dev/null
+                    then
+                        sudo yum install -y aws-cli
+                    else
+                        echo "Unsupported package manager. Please install AWS CLI manually."
+                        exit 1
+                    fi
+                fi
+                
       - name: 'Run :: Stop EC2 Runner'
         uses: machulav/ec2-github-runner@v2
         with:
