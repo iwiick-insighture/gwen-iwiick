@@ -7,7 +7,7 @@ name: >-
       - main
   workflow_dispatch: {}
   repository_dispatch:
-    types: pipeline_8627a882-c1cf-491e-ba7f-68d860bab8d2
+    types: pipeline_df2f7b53-5fc2-4a56-8b3a-719f86585135
 env:
   ENCODED_PIPELINE_SECRET: >-
     ${{secrets.GWENIWIICK_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16_GWENDEV_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16}}
@@ -30,7 +30,7 @@ jobs:
       label: ${{ steps.start-ec2-runner.outputs.label }}
       ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
     steps:
-      - name: 'Run :: Decoding Secrets 2f341d5e-8101-4d31-8424-b82012d2bb89'
+      - name: 'Run :: Decoding Secrets fb6d485c-9dd9-41a4-aed5-67395f7bc481'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -40,7 +40,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials 843b05b7-746a-4874-bb2d-91629d4f0e4f'
+      - name: 'Run :: Configure AWS credentials 1268197a-040a-4e88-8679-4ac5f376e121'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
@@ -72,7 +72,7 @@ jobs:
       - name: 'Run :: Checkout Specific Commit'
         if: ${{ github.event.client_payload.commitId != null }}
         run: git checkout ${{ github.event.client_payload.commitId }}
-      - name: 'Run :: Decoding Secrets e9d9b98f-21d5-44f3-b5e6-676c0bfbba62'
+      - name: 'Run :: Decoding Secrets 5d9a1c1c-106b-432d-9b22-db0d551c7903'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -82,7 +82,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials d141dc5a-95fc-4f50-a26c-229ee5a0ac3b'
+      - name: 'Run :: Configure AWS credentials 8465f02f-57a6-43c8-9e07-ce4d8e387d24'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
@@ -103,27 +103,7 @@ jobs:
               docker-compose -f ${{env.DOCKER_COMPOSE_FILE_PATH}} down -v
               
       - name: 'Run :: Sync Gwen Results to S3 bucket'
-        run: |2-
-
-              # Check if AWS CLI is installed
-                if ! command -v aws &> /dev/null
-                then
-                    # Install AWS CLI using package manager (e.g., apt or yum)
-                    if command -v apt-get &> /dev/null
-                    then
-                        sudo apt-get update
-                        sudo apt-get install -y awscli
-                    elif command -v yum &> /dev/null
-                    then
-                        sudo yum install -y aws-cli
-                    else
-                        echo "Unsupported package manager. Please install AWS CLI manually."
-                        exit 1
-                    fi
-                fi
-                
-              aws s3 sync ./gwen/output/reports ${{ env.WEB_APP_S3_SYNC_URL }}
-              
+        run: aws s3 sync ./gwen/output/reports ${{ env.WEB_APP_S3_SYNC_URL }}
       - name: 'Run :: Deploy and Notify Resource Service'
         run: |2-
 
@@ -151,7 +131,7 @@ jobs:
       - gwen-job
     if: ${{ always() }}
     steps:
-      - name: 'Run :: Decoding Secrets 2f7fdd5c-4356-42b2-890f-01fdbfb20458'
+      - name: 'Run :: Decoding Secrets 42f963e7-eff3-465b-86d6-c0dcb4ad2e33'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -161,7 +141,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials fe0a5952-80c3-44ff-ad9b-dc2c48720f07'
+      - name: 'Run :: Configure AWS credentials 1cf74aeb-8cbc-4704-bbb6-2efa5668c193'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
