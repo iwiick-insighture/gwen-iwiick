@@ -88,6 +88,13 @@ jobs:
           role-to-assume: ${{ env.roleARN }}
           role-session-name: skyu-pipeline-assume-role-session
           aws-region: ${{ env.region }}
+
+      - name: 'Run :: Install AWS CLI'
+        run: |
+          echo "------------- Installing AWS CLI -------------" && 
+          sudo apt update && 
+          sudo apt install -y awscli
+          
       - name: 'Run :: Checking AWS version'
         run: aws --version
       - name: 'Run :: Docker Compose'
