@@ -7,7 +7,7 @@ name: >-
       - main
   workflow_dispatch: {}
   repository_dispatch:
-    types: pipeline_875ca833-b65b-4d75-bb6a-1500d87de75d
+    types: pipeline_8d8ac8be-f3a2-4b21-920a-9037c55cb474
 env:
   ENCODED_PIPELINE_SECRET: >-
     ${{secrets.GWENIWIICK_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16_GWENDEV_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16}}
@@ -27,7 +27,7 @@ jobs:
       label: ${{ steps.start-ec2-runner.outputs.label }}
       ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
     steps:
-      - name: 'Run :: Decoding Secrets eccc9146-717e-4f77-aff4-abccbeda76ed'
+      - name: 'Run :: Decoding Secrets fa3df381-9af8-45fa-bd80-2019b8d2b124'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -37,7 +37,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials 1f55cbe2-a196-4f06-b957-5c87d518e9ad'
+      - name: 'Run :: Configure AWS credentials 9563cd81-43e3-49e3-8bb3-435701d53047'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
@@ -69,7 +69,7 @@ jobs:
       - name: 'Run :: Checkout Specific Commit'
         if: ${{ github.event.client_payload.commitId != null }}
         run: git checkout ${{ github.event.client_payload.commitId }}
-      - name: 'Run :: Decoding Secrets c09fcc00-4613-4ff4-91d4-d8718d707b75'
+      - name: 'Run :: Decoding Secrets 266ba014-1d33-40ce-8d97-ce6b778d7d5b'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -79,7 +79,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials 715b3308-d1f1-45b6-8651-a2e861126731'
+      - name: 'Run :: Configure AWS credentials f607fff0-d825-48ac-a71d-c15676eb4c22'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
@@ -108,12 +108,12 @@ jobs:
                 sudo apt install -y awscli
               fi
 
-              if aws s3api head-bucket --bucket undefined 2>/dev/null; then
-                echo "Bucket undefined exists."
+              if aws s3api head-bucket --bucket skyu-client-reports 2>/dev/null; then
+                echo "Bucket skyu-client-reports exists."
               # Create the S3 bucket if it doesn't exist
               else
-                echo "Creating bucket undefined..."
-                aws s3api create-bucket --bucket undefined --region ${{ env.region }}
+                echo "Creating bucket skyu-client-reports..."
+                aws s3api create-bucket --bucket skyu-client-reports --region ${{ env.region }}
               fi
 
               aws s3 sync ./gwen/output/reports ${{ env.WEB_APP_S3_SYNC_URL }}
@@ -145,7 +145,7 @@ jobs:
       - gwen-job
     if: ${{ always() }}
     steps:
-      - name: 'Run :: Decoding Secrets 48a4418a-4cb3-4568-bcde-6b4efbb09a3d'
+      - name: 'Run :: Decoding Secrets 4a8490b3-b6d2-4802-b491-94080de592d0'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -155,7 +155,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials f7f2b3f6-ccaf-4125-9754-f5eabd478c2b'
+      - name: 'Run :: Configure AWS credentials b1b779e8-d471-4803-bc6d-1fe60ec7158e'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
