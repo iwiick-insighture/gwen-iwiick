@@ -67,7 +67,8 @@ jobs:
               ssh -o StrictHostKeyChecking=no -i $HOME/QWENKey.pem ubuntu@${{ env.EC2_HOST }} '
                 ls -la ~/
               '
-              ls -R
+      - name: 'TESTINGGGGGGGG'
+        run: ls -R
               
       - name: 'Run :: Execute Commands on EC2'
         uses: appleboy/ssh-action@master
