@@ -15,7 +15,7 @@ env:
   EC2_IMAGE_ID: ami-0c7217cdde317cfec
   EC2_SUBNET_ID: subnet-0511e49f8669e4d30
   EC2_SECURITY_GROUP_ID: sg-0244f2edb7af33703
-  EC2_SPOT_INSTANCE_PRICE: '0.5'
+  EC2_SPOT_INSTANCE_PRICE: '0.05'
   DEPLOY_STEP_SHOULD_DEPLOY: 'true'
 jobs:
   start-runner:
@@ -67,15 +67,13 @@ jobs:
               ssh -o StrictHostKeyChecking=no -i $HOME/QWENKey.pem ubuntu@${{ env.EC2_HOST }} '
                 ls -la ~/
               '
-      - name: 'TESTINGGGGGGGG'
-        run: ls -R
               
       - name: 'Run :: Execute Commands on EC2'
         uses: appleboy/ssh-action@master
         with:
           host: ${{ env.EC2_HOST }}
           username: ubuntu
-          key_path: $HOME/QWENKey.pem
+          key_path: $$HOME/QWENKey.pem
           script: |2-
 
                     sudo apt-get update
