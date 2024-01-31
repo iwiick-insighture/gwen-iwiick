@@ -67,13 +67,18 @@ jobs:
               ssh -o StrictHostKeyChecking=no -i $HOME/QWENKey.pem ubuntu@${{ env.EC2_HOST }} '
                 ls -la ~/
               '
+      - name: Print Key File Content
+        run: cat $HOME/QWENKey.pem
+
+      - name: Set Key File Permissions
+        run: chmod 600 $HOME/QWENKey.pem
               
       - name: 'Run :: Execute Commands on EC2'
         uses: appleboy/ssh-action@master
         with:
           host: ${{ env.EC2_HOST }}
           username: ubuntu
-          key_path: '/github/home/QWENKey.pem'
+          key_path: $HOME/QWENKey.pem
           script: |2-
 
                     sudo apt-get update
