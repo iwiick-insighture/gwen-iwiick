@@ -73,7 +73,7 @@ jobs:
         with:
           host: ${{ env.EC2_HOST }}
           username: ubuntu
-          key_path: $$HOME/QWENKey.pem
+          key_path: '/github/home/QWENKey.pem'
           script: |2-
 
                     sudo apt-get update
