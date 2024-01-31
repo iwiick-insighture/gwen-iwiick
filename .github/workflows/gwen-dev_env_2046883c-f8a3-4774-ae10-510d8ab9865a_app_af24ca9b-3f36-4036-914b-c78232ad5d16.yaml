@@ -7,7 +7,7 @@ name: >-
       - main
   workflow_dispatch: {}
   repository_dispatch:
-    types: pipeline_34786f80-6650-4fe4-8c9d-7284275f8717
+    types: pipeline_8b545297-381d-4016-82cb-14346c40b0df
 env:
   ENCODED_PIPELINE_SECRET: >-
     ${{secrets.GWENIWIICK_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16_GWENDEV_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16}}
@@ -26,7 +26,7 @@ jobs:
       EC2_HOST: ${{ env.EC2_HOST }}
       EC2_INSTANCE_ID: ${{ env.EC2_INSTANCE_ID }}
     steps:
-      - name: 'Run :: Decoding Secrets edb624a6-d786-47b7-8844-5a630c4544c0'
+      - name: 'Run :: Decoding Secrets 294228c1-78d1-4002-8835-2d031c86bc34'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -36,20 +36,12 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials 1d849bcc-1656-40de-87f3-1cb9b38a1d4c'
+      - name: 'Run :: Configure AWS credentials 0f058caf-7325-4803-9318-a7d539d0994c'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
           role-session-name: skyu-pipeline-assume-role-session
           aws-region: ${{ env.region }}
-      - name: 'Run :: Create AWS SSH with Permissions'
-        run: |2-
-
-              aws ec2 delete-key-pair --key-name QWENKey || true
-              aws ec2 create-key-pair --key-name QWENKey --query 'KeyMaterial' --output text >> $HOME/QWENKey.pem
-              chmod 600 $HOME/QWENKey.pem
-              cat $HOME/QWENKey.pem
-              
       - name: 'Run :: Create AWS Spot Instance'
         run: |2-
 
@@ -65,10 +57,17 @@ jobs:
               # docker-compose
               sudo curl -L 'https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)' -o /usr/local/bin/docker-compose
               sudo chmod +x /usr/local/bin/docker-compose
+
+              # Registring the runner
+              mkdir actions-runner && cd actions-runner
+              curl -o actions-runner-linux-x64-2.312.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.312.0/actions-runner-linux-x64-2.312.0.tar.gz
+              echo "85c1bbd104d539f666a89edef70a18db2596df374a1b51670f2af1578ecbe031  actions-runner-linux-x64-2.312.0.tar.gz" | shasum -a 256 -c
+              tar xzf ./actions-runner-linux-x64-2.312.0.tar.gz
+              ./config.sh --url https://github.com/iwiick-insighture/gwen-iwiick --token BAHQ7LFPETXTGNFT67BBGWTFXHWAI
+              ./run.sh
               "
 
               ENCODED_USER_DATA=$(echo -n "$USER_DATA" | base64 -w 0)
-              echo "ENCODED_USER_DATA :: $ENCODED_USER_DATA"
               echo "ENCODED_USER_DATA=$ENCODED_USER_DATA" >> $GITHUB_ENV
 
               REQUEST_ID=$(aws ec2 request-spot-instances     --spot-price "${{ env.EC2_SPOT_INSTANCE_PRICE }}"     --instance-count 1     --type "one-time"     --launch-specification '{"ImageId":"${{ env.EC2_IMAGE_ID }}","InstanceType":"${{ env.EC2_INSTANCE_TYPE }}","KeyName":"QWENKey","SecurityGroupIds": [ "${{ env.EC2_SECURITY_GROUP_ID }}" ], "SubnetId": "${{ env.EC2_SUBNET_ID }}", "UserData": "${{env.ENCODED_USER_DATA}}"}'     --query 'SpotInstanceRequests[0].SpotInstanceRequestId'     --output text)
@@ -82,7 +81,7 @@ jobs:
   gwen-job:
     name: Gwen Job
     permissions: write-all
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs:
       - start-runner
     steps:
@@ -97,7 +96,7 @@ jobs:
       - name: 'Run :: Checkout Specific Commit'
         if: ${{ github.event.client_payload.commitId != null }}
         run: git checkout ${{ github.event.client_payload.commitId }}
-      - name: 'Run :: Decoding Secrets 190fc45a-71cf-4afd-81c0-e9d799586837'
+      - name: 'Run :: Decoding Secrets fb22faeb-cd04-4e2d-9843-1a253d474f93'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -107,8 +106,12 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: TESTINGGGGGGGGGGGGGGG
-        run: echo "HELLOOOOOOOOOOO"
+      - name: 'Run :: Gwen'
+        run: |2-
+
+              docker-compose -f ${{env.DOCKER_COMPOSE_FILE_PATH}} run gwen &&
+              docker-compose -f ${{env.DOCKER_COMPOSE_FILE_PATH}} down -v
+              
   deploy:
     name: Deploy
     permissions: write-all
@@ -117,7 +120,7 @@ jobs:
       - gwen-job
     if: ${{ always() }}
     steps:
-      - name: 'Run :: Decoding Secrets a5d3d68a-b352-459e-a79d-5a53b32b067a'
+      - name: 'Run :: Decoding Secrets ace35ba2-36e2-4061-a2a8-a89e0b649838'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -154,7 +157,7 @@ jobs:
       - gwen-job
     if: ${{ always() }}
     steps:
-      - name: 'Run :: Decoding Secrets 6a41cc49-899a-4420-b0a0-3ce5346ea2ac'
+      - name: 'Run :: Decoding Secrets e984306e-9633-424b-8003-368af3c9da4a'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -164,7 +167,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials e6a036a4-e800-42e9-9dea-f6a7c57f191d'
+      - name: 'Run :: Configure AWS credentials b01e3547-7fd9-41bd-9203-6adc071e9122'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
