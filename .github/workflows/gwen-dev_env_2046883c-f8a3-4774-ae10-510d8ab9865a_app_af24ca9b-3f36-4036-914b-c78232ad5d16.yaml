@@ -7,7 +7,7 @@ name: >-
       - main
   workflow_dispatch: {}
   repository_dispatch:
-    types: pipeline_862e4bdc-6cf8-4431-9797-83c36e5c03bb
+    types: pipeline_6f9ca4b5-73d8-42c9-8613-74b6d9d9289f
 env:
   ENCODED_PIPELINE_SECRET: >-
     ${{secrets.GWENIWIICK_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16_GWENDEV_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16}}
@@ -26,7 +26,7 @@ jobs:
       EC2_HOST: ${{ env.EC2_HOST }}
       EC2_INSTANCE_ID: ${{ env.EC2_INSTANCE_ID }}
     steps:
-      - name: 'Run :: Decoding Secrets 36c82904-9297-4ffd-8e9b-e97e6e2d7bc0'
+      - name: 'Run :: Decoding Secrets e3db5db1-d1f4-4c93-b8de-a770ecaa56ce'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -36,7 +36,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials 2d7b8b14-8e81-4db0-ab94-b05b9eb4bc0f'
+      - name: 'Run :: Configure AWS credentials 7ce59212-76cb-4d36-9180-0d06e0d456a0'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
@@ -45,32 +45,39 @@ jobs:
       - name: 'Run :: Create AWS Spot Instance'
         run: |2-
 
-              read -r -d '' USER_DATA <<'EOF'
-              #!/bin/bash
-              sudo apt update && sudo apt install -y apt-transport-https
-              sudo apt-get update && sudo apt install docker.io -y
-              sudo usermod -aG docker $USER
-              newgrp docker
-              sudo curl -L 'https://github.com/docker/compose/releases/latest/download/docker-compose-Linux-x86_64' -o /usr/local/bin/docker-compose
-              sudo chmod +x /usr/local/bin/docker-compose
-              mkdir actions-runner && cd actions-runner
-              curl -o actions-runner-linux-x64-2.312.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.312.0/actions-runner-linux-x64-2.312.0.tar.gz
-              tar xzf ./actions-runner-linux-x64-2.312.0.tar.gz
-              ./config.sh --url https://github.com/iwiick-insighture/gwen-iwiick --token ${{ env.pat }}
-              ./run.sh
-              EOF
-            
-              ENCODED_USER_DATA=$(echo -n "$USER_DATA" | base64 -w 0)
-              echo "ENCODED_USER_DATA :: $ENCODED_USER_DATA"
-              echo "LAUNCH SPECIFICATION JSON :: {\"ImageId\":\"${{ env.EC2_IMAGE_ID }}\",\"InstanceType\":\"${{ env.EC2_INSTANCE_TYPE }}\",\"KeyName\":\"QWENKey\",\"SecurityGroupIds\":[\"${{ env.EC2_SECURITY_GROUP_ID }}\"],\"SubnetId\":\"${{ env.EC2_SUBNET_ID }}\",\"UserData\":\"$ENCODED_USER_DATA\"}"
+                USER_DATA="
+                #!/bin/bash
+                sudo apt update && sudo apt install -y apt-transport-https
+                sudo apt-get update && sudo apt install docker.io -y
+                sudo usermod -aG docker $USER
+                newgrp docker
 
-              REQUEST_ID=$(aws ec2 request-spot-instances     --spot-price "${{ env.EC2_SPOT_INSTANCE_PRICE }}"     --instance-count 1     --type "one-time"     --launch-specification "{\"ImageId\":\"${{ env.EC2_IMAGE_ID }}\",\"InstanceType\":\"${{ env.EC2_INSTANCE_TYPE }}\",\"KeyName\":\"QWENKey\",\"SecurityGroupIds\":[\"${{ env.EC2_SECURITY_GROUP_ID }}\"],\"SubnetId\":\"${{ env.EC2_SUBNET_ID }}\",\"UserData\":\"$ENCODED_USER_DATA\"}"     --query 'SpotInstanceRequests[0].SpotInstanceRequestId'     --output text)
-              aws ec2 wait spot-instance-request-fulfilled --spot-instance-request-ids $REQUEST_ID
-              INSTANCE_ID=$(aws ec2 describe-spot-instance-requests --spot-instance-request-ids $REQUEST_ID --query 'SpotInstanceRequests[*].InstanceId' --output text)
-              HOSTNAME=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query 'Reservations[0].Instances[0].PublicDnsName' --output text)
-              
-              echo "EC2_HOST=$HOSTNAME" >> $GITHUB_ENV
-              echo "EC2_INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV 
+                # docker-compose
+                sudo curl -L 'https://github.com/docker/compose/releases/latest/download/docker-compose-Linux-x86_64' -o /usr/local/bin/docker-compose
+                sudo chmod +x /usr/local/bin/docker-compose
+            
+                # Install GitHub Actions runner
+                mkdir actions-runner && cd actions-runner
+                curl -o actions-runner-linux-x64-2.312.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.312.0/actions-runner-linux-x64-2.312.0.tar.gz
+                
+                # Run GitHub Actions runner configuration
+                ./config.sh --url https://github.com/iwiick-insighture/gwen-iwiick --token ${{ env.pat }}
+                
+                # Run GitHub Actions runner
+                ./run.sh
+                "
+            
+                ENCODED_USER_DATA=$(echo -n "$USER_DATA" | sed 's/^[[:space:]]*//' | base64 -w 0)
+                echo "ENCODED_USER_DATA :: $ENCODED_USER_DATA"
+                echo "LAUNCH SPECIFICATION JSON :: {\"ImageId\":\"${{ env.EC2_IMAGE_ID }}\",\"InstanceType\":\"${{ env.EC2_INSTANCE_TYPE }}\",\"KeyName\":\"QWENKey\",\"SecurityGroupIds\":[\"${{ env.EC2_SECURITY_GROUP_ID }}\"],\"SubnetId\":\"${{ env.EC2_SUBNET_ID }}\",\"UserData\":\"$ENCODED_USER_DATA\"}"
+            
+                REQUEST_ID=$(aws ec2 request-spot-instances       --spot-price "${{ env.EC2_SPOT_INSTANCE_PRICE }}"       --instance-count 1       --type "one-time"       --launch-specification "{\"ImageId\":\"${{ env.EC2_IMAGE_ID }}\",\"InstanceType\":\"${{ env.EC2_INSTANCE_TYPE }}\",\"KeyName\":\"QWENKey\",\"SecurityGroupIds\":[\"${{ env.EC2_SECURITY_GROUP_ID }}\"],\"SubnetId\":\"${{ env.EC2_SUBNET_ID }}\",\"UserData\":\"$ENCODED_USER_DATA\"}"       --query 'SpotInstanceRequests[0].SpotInstanceRequestId'       --output text)
+                aws ec2 wait spot-instance-request-fulfilled --spot-instance-request-ids $REQUEST_ID
+                INSTANCE_ID=$(aws ec2 describe-spot-instance-requests --spot-instance-request-ids $REQUEST_ID --query 'SpotInstanceRequests[*].InstanceId' --output text)
+                HOSTNAME=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query 'Reservations[0].Instances[0].PublicDnsName' --output text)
+                
+                echo "EC2_HOST=$HOSTNAME" >> $GITHUB_ENV
+                echo "EC2_INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV 
               
   gwen-job:
     name: Gwen Job
@@ -90,7 +97,7 @@ jobs:
       - name: 'Run :: Checkout Specific Commit'
         if: ${{ github.event.client_payload.commitId != null }}
         run: git checkout ${{ github.event.client_payload.commitId }}
-      - name: 'Run :: Decoding Secrets 2738467b-f986-4b64-8c59-23bf64cd9629'
+      - name: 'Run :: Decoding Secrets e5ad52a7-79f9-477f-9478-196b2674ddcc'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -113,7 +120,7 @@ jobs:
     needs:
       - gwen-job
     steps:
-      - name: 'Run :: Decoding Secrets cc322a43-561a-40cb-9b5f-7fde21ea7d49'
+      - name: 'Run :: Decoding Secrets c9c161d6-303b-4bfc-a13e-9892113ada84'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -150,7 +157,7 @@ jobs:
       - gwen-job
     if: ${{ always() }}
     steps:
-      - name: 'Run :: Decoding Secrets 8843b994-0299-47d8-9e0b-db9972f4606b'
+      - name: 'Run :: Decoding Secrets 69cf0c95-b328-4a3b-ba58-684b0eea601c'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -160,7 +167,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials 3f5bba45-18fa-4039-ae55-5511fbab8b4e'
+      - name: 'Run :: Configure AWS credentials f39fce66-c8a8-4764-98f6-2c659ae4bf15'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
