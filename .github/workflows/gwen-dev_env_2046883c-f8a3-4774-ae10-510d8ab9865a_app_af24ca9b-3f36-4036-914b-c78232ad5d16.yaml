@@ -7,7 +7,7 @@ name: >-
       - main
   workflow_dispatch: {}
   repository_dispatch:
-    types: pipeline_983ebc66-0dc9-438b-ae16-65d5a7592e2c
+    types: pipeline_0030a20d-c075-4290-a537-19d21f43540c
 env:
   ENCODED_PIPELINE_SECRET: >-
     ${{secrets.GWENIWIICK_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16_GWENDEV_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16}}
@@ -26,7 +26,7 @@ jobs:
       EC2_HOST: ${{ env.EC2_HOST }}
       EC2_INSTANCE_ID: ${{ env.EC2_INSTANCE_ID }}
     steps:
-      - name: 'Run :: Decoding Secrets 73435171-7076-49e7-af96-b3f2483dd965'
+      - name: 'Run :: Decoding Secrets f73b22a4-6967-417f-b78f-60f20c927f71'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -36,7 +36,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials dd2b2d78-f1ca-4d73-a9ca-df27729116a7'
+      - name: 'Run :: Configure AWS credentials f2b7be3e-4830-4c11-8709-9f5fe50cc13e'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
@@ -69,7 +69,7 @@ jobs:
 
               echo "ENCODED_USER_DATA :: $ENCODED_USER_DATA"
 
-              REQUEST_ID=$(aws ec2 request-spot-instances     --spot-price "${{ env.EC2_SPOT_INSTANCE_PRICE }}"     --instance-count 1     --type "one-time"     --launch-specification '{"ImageId":"${{ env.EC2_IMAGE_ID }}","InstanceType":"${{ env.EC2_INSTANCE_TYPE }}","KeyName":"QWENKey","SecurityGroupIds": [ "${{ env.EC2_SECURITY_GROUP_ID }}" ], "SubnetId": "${{ env.EC2_SUBNET_ID }}", "UserData":$ENCODED_USER_DATA}'     --query 'SpotInstanceRequests[0].SpotInstanceRequestId'     --output text)
+              REQUEST_ID=$(aws ec2 request-spot-instances     --spot-price "${{ env.EC2_SPOT_INSTANCE_PRICE }}"     --instance-count 1     --type "one-time"     --launch-specification '{"ImageId":"${{ env.EC2_IMAGE_ID }}","InstanceType":"${{ env.EC2_INSTANCE_TYPE }}","KeyName":"QWENKey","SecurityGroupIds": [ "${{ env.EC2_SECURITY_GROUP_ID }}" ], "SubnetId": "${{ env.EC2_SUBNET_ID }}", "UserData": "$ENCODED_USER_DATA"}'     --query 'SpotInstanceRequests[0].SpotInstanceRequestId'     --output text)
               aws ec2 wait spot-instance-request-fulfilled --spot-instance-request-ids $REQUEST_ID
               INSTANCE_ID=$(aws ec2 describe-spot-instance-requests --spot-instance-request-ids $REQUEST_ID --query 'SpotInstanceRequests[*].InstanceId' --output text)
               HOSTNAME=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query 'Reservations[0].Instances[0].PublicDnsName' --output text)
@@ -94,7 +94,7 @@ jobs:
       - name: 'Run :: Checkout Specific Commit'
         if: ${{ github.event.client_payload.commitId != null }}
         run: git checkout ${{ github.event.client_payload.commitId }}
-      - name: 'Run :: Decoding Secrets 675da68d-abbc-44a7-ab47-d6a7f7c20b49'
+      - name: 'Run :: Decoding Secrets e0597ac5-0238-4802-bc24-6fc625957665'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -114,7 +114,7 @@ jobs:
       - gwen-job
     if: ${{ always() }}
     steps:
-      - name: 'Run :: Decoding Secrets 09b359ee-9028-4860-b35a-81e84087b0a4'
+      - name: 'Run :: Decoding Secrets 78a7e514-4762-44da-ad75-80cbba70f322'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -151,7 +151,7 @@ jobs:
       - gwen-job
     if: ${{ always() }}
     steps:
-      - name: 'Run :: Decoding Secrets be0786fd-31ad-490e-ac01-7a848c8d28b0'
+      - name: 'Run :: Decoding Secrets 3801841c-8836-48d3-8320-364cc0102215'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -161,7 +161,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials 7337d51d-d84e-4276-a82d-f122c1c02ddc'
+      - name: 'Run :: Configure AWS credentials eda9bcb4-2898-4330-afa3-d9471ce1762f'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
