@@ -7,7 +7,7 @@ name: >-
       - main
   workflow_dispatch: {}
   repository_dispatch:
-    types: pipeline_2d41c7c0-7acb-4c41-a535-b78e2b015951
+    types: pipeline_8dc001cb-9d59-4820-a1b3-6fd5b2c30048
 env:
   ENCODED_PIPELINE_SECRET: >-
     ${{secrets.GWENIWIICK_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16_GWENDEV_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16}}
@@ -26,7 +26,7 @@ jobs:
       EC2_HOST: ${{ env.EC2_HOST }}
       EC2_INSTANCE_ID: ${{ env.EC2_INSTANCE_ID }}
     steps:
-      - name: 'Run :: Decoding Secrets a5a35755-ba5a-4e01-965f-f305072e5d89'
+      - name: 'Run :: Decoding Secrets 05456f29-073d-45fc-a33e-13164c20890f'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -36,7 +36,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials 92a73865-0b68-4225-9593-825562952bdc'
+      - name: 'Run :: Configure AWS credentials a7dc5966-a315-46e2-8d0d-1b1b6194bd17'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
@@ -72,14 +72,17 @@ jobs:
               ENCODED_USER_DATA=$(echo -n "$USER_DATA" | base64)
               echo "ENCODED_USER_DATA=$ENCODED_USER_DATA"
 
-              LAUNCH_SPECIFICATION='{
-                "ImageId": "${{ env.EC2_IMAGE_ID }}",
-                "InstanceType": "${{ env.EC2_INSTANCE_TYPE }}",
+              LAUNCH_SPECIFICATION=$(cat <<EOF
+              {
+                "ImageId": "ami-0c7217cdde317cfec",
+                "InstanceType": "t2.medium",
                 "KeyName": "QWENKey",
-                "SecurityGroupIds": ["${{ env.EC2_SECURITY_GROUP_ID }}"],
-                "SubnetId": "${{ env.EC2_SUBNET_ID }}",
+                "SecurityGroupIds": ["sg-0244f2edb7af33703"],
+                "SubnetId": "subnet-0511e49f8669e4d30",
                 "UserData": "$ENCODED_USER_DATA"
-              }'
+              }
+              EOF
+              )
 
               REQUEST_ID=$(aws ec2 request-spot-instances       --spot-price "${{ env.EC2_SPOT_INSTANCE_PRICE }}"       --instance-count 1       --type "one-time"       --launch-specification "$LAUNCH_SPECIFICATION"       --query 'SpotInstanceRequests[0].SpotInstanceRequestId'       --output text)
 
@@ -108,7 +111,7 @@ jobs:
       - name: 'Run :: Checkout Specific Commit'
         if: ${{ github.event.client_payload.commitId != null }}
         run: git checkout ${{ github.event.client_payload.commitId }}
-      - name: 'Run :: Decoding Secrets 71c28d13-5b84-4bb4-ba6e-42625a0c0be2'
+      - name: 'Run :: Decoding Secrets 0336cfb4-efa6-4339-a618-3e69281f22cb'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -132,7 +135,7 @@ jobs:
       - gwen-job
     if: ${{ always() }}
     steps:
-      - name: 'Run :: Decoding Secrets 1f9cc7d9-244e-48ec-9869-3a570fcba2f7'
+      - name: 'Run :: Decoding Secrets e30796b9-ef31-4376-bc60-78d60c5a0f7c'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -169,7 +172,7 @@ jobs:
       - gwen-job
     if: ${{ always() }}
     steps:
-      - name: 'Run :: Decoding Secrets 0c46229c-795a-41d6-83fe-282877d3b3d5'
+      - name: 'Run :: Decoding Secrets 1b55279d-2b97-49a1-9f97-981db197761a'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -179,7 +182,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials 5be1096d-bba4-4d89-872d-595c942535e9'
+      - name: 'Run :: Configure AWS credentials d39b29f4-1179-4d7e-862d-e6d5df4c0a77'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
