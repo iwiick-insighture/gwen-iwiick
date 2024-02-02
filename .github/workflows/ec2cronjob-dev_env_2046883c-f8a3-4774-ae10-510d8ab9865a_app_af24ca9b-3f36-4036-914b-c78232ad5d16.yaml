@@ -37,6 +37,7 @@ jobs:
         run: |2-
               response=$(curl -X GET \
               https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runners \
-              -H 'Authorization: ${secrets.MY_TOKEN}')
+              -H 'Authorization: Bearer ${secrets.MY_TOKEN}'
+              )
 
               echo "RUNNERS :: $response"
