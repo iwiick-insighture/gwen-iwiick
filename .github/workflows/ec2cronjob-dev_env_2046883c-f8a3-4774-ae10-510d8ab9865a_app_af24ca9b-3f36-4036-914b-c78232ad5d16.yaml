@@ -36,8 +36,10 @@ jobs:
       - name: 'Run :: Create AWS Spot Instance'
         run: |2-
               response=$(curl -X GET \
-                https://api.github.com/repos/iwiick-insighture/gwen-iwiick/actions/runners \
+                https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runners \
                 -H 'Authorization: Bearer ${{ secrets.MY_TOKEN }}'
               )
 
-              echo "RUNNERS :: $response"
+              offline_runners=$(echo "$response" | jq '.runners | map(select(.status == "offline"))')
+
+              echo "RUNNERS :: $offline_runners"
