@@ -39,5 +39,5 @@ jobs:
               https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runners \
               -H 'Authorization: Bearer ${secrets.MY_TOKEN}')
 
-              runners=$(echo "$response" | jq '.runners | map(select(.status == "offline"))')
+              runners=$(echo "$response")
               echo "RUNNERS :: $runners"
