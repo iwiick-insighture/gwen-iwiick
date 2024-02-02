@@ -7,7 +7,7 @@ name: >-
       - main
   workflow_dispatch: {}
   repository_dispatch:
-    types: pipeline_753b3dec-f60c-457d-a835-44be6a82d02f
+    types: pipeline_7a4de3d9-ccd3-40f7-ba9a-73a0e31691ab
 env:
   ENCODED_PIPELINE_SECRET: >-
     ${{secrets.GWENIWIICK_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16_SPOTEC2DEV_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16}}
@@ -19,6 +19,10 @@ env:
   DOCKER_COMPOSE_FILE_PATH: gwen/docker-compose.yml
   ADDITIONAL_COMPOSE_COMMANDS: 'docker-compose -f gwen/docker-compose.yml run gwen && '
   IMAGE_TAG: ${{github.event.client_payload.commitId || github.sha}}
+  S3_SOURCE_PATH: ./gwen/output/reports
+  S3_SYNC_URL: >-
+    s3://skyu-client-reports/org_9f875a32-727f-4fb0-aeb6-ad3b32168642/project_88e61e3d-8f14-4fe8-b600-517e8138c28d/app_af24ca9b-3f36-4036-914b-c78232ad5d16/gwen_outputs/${{github.event.client_payload.commitId
+    || github.sha}}
   DEPLOY_STEP_SHOULD_DEPLOY: 'false'
 jobs:
   start-runner:
@@ -29,7 +33,7 @@ jobs:
       EC2_HOST: ${{ env.EC2_HOST }}
       EC2_INSTANCE_ID: ${{ env.EC2_INSTANCE_ID }}
     steps:
-      - name: 'Run :: Decoding Secrets 6737f891-9e13-44d6-a598-30db252de511'
+      - name: 'Run :: Decoding Secrets e7967ec6-8e3c-4776-a436-0f59c661d182'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -39,7 +43,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials 2b294283-aa5f-418c-a171-2d87358db969'
+      - name: 'Run :: Configure AWS credentials 8d48ace1-071c-42cf-b6d4-12e26eb8132c'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
@@ -123,7 +127,7 @@ jobs:
       - name: 'Run :: Checkout Specific Commit'
         if: ${{ github.event.client_payload.commitId != null }}
         run: git checkout ${{ github.event.client_payload.commitId }}
-      - name: 'Run :: Decoding Secrets 7779f236-2a43-4eb7-80af-c19ff893917f'
+      - name: 'Run :: Decoding Secrets 5667c535-682d-4104-bbe5-5c763ffa6d77'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -133,12 +137,37 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
+      - name: 'Run :: Configure AWS credentials 064a0fb2-51ff-49b4-8691-23c71b6fe78a'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.roleARN }}
+          role-session-name: skyu-pipeline-assume-role-session
+          aws-region: ${{ env.region }}
       - name: 'Run :: Docker Compose'
         run: |2-
 
               docker-compose -f ${{env.DOCKER_COMPOSE_FILE_PATH}} build && docker-compose -f ${{env.DOCKER_COMPOSE_FILE_PATH}} up -d &&
               ${{env.ADDITIONAL_COMPOSE_COMMANDS}}
               docker-compose -f ${{env.DOCKER_COMPOSE_FILE_PATH}} down -v
+              
+      - name: 'Run :: Sync Outputs to S3 bucket'
+        run: |2-
+
+              if [ ! -x "$(command -v aws)" ]; then
+                echo "AWS CLI not found, installing..."
+                sudo apt update
+                sudo apt install -y awscli
+              fi
+
+              if aws s3api head-bucket --bucket skyu-client-reports 2>/dev/null; then
+                echo "Bucket skyu-client-reports exists."
+              # Create the S3 bucket if it doesn't exist
+              else
+                echo "Creating bucket skyu-client-reports..."
+                aws s3api create-bucket --bucket skyu-client-reports --region ${{ env.region }}
+              fi
+
+              aws s3 sync ${{ env.S3_SOURCE_PATH }} ${{ env.S3_SYNC_URL }}
               
   deploy:
     name: Deploy
@@ -147,7 +176,7 @@ jobs:
     needs:
       - compose-job
     steps:
-      - name: 'Run :: Decoding Secrets 55866dd2-d388-4fda-900d-7da82954e47a'
+      - name: 'Run :: Decoding Secrets fdbe2f61-8001-4786-900a-adeb29745e24'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -184,7 +213,7 @@ jobs:
       - compose-job
     if: ${{ always() }}
     steps:
-      - name: 'Run :: Decoding Secrets 34f5f159-f5fa-42ca-84cf-cd503e30b7ee'
+      - name: 'Run :: Decoding Secrets 76bb4f05-d2bb-4981-b70c-4560abc5a50d'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -194,7 +223,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials b528908b-8e9f-4c74-bf11-1c1d3f2e22f3'
+      - name: 'Run :: Configure AWS credentials 010014f0-b00b-4bf5-a982-3f1866a70ba2'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
