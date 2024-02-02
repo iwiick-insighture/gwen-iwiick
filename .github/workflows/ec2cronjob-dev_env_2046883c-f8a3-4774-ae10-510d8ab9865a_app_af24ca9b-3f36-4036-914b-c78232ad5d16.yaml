@@ -121,6 +121,9 @@ jobs:
 
               echo " Starting GitHub Action!" && 
               echo "STEPS_CAN_PROCEED=true" >> $GITHUB_ENV
+
+      - name: TESTTTTTTTTTTT
+        run: ls -R
               
       - name: 'Run :: Checkout repository'
         uses: actions/checkout@v2
