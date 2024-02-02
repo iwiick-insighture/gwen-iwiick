@@ -40,7 +40,6 @@ jobs:
                 -H 'Authorization: Bearer ${{ secrets.MY_TOKEN }}'
               )
 
-              echo "Response: $response"
               offline_skyu_runners=$(echo "$response" | jq '.runners | map(select(.status == "offline" and (.labels[]? | .name == "skyu")))')
               echo "RUNNERS :: $offline_skyu_runners"
 
