@@ -7,7 +7,7 @@ name: >-
       - main
   workflow_dispatch: {}
   repository_dispatch:
-    types: pipeline_e169478a-00b7-4aed-ab1a-a2a5578755fe
+    types: pipeline_3f697052-7ee8-4edb-a02c-34e046ea0197
 env:
   ENCODED_PIPELINE_SECRET: >-
     ${{secrets.GWENIWIICK_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16_SPOTEC2DEV_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16}}
@@ -17,6 +17,7 @@ env:
   EC2_SECURITY_GROUP_ID: sg-0244f2edb7af33703
   EC2_SPOT_INSTANCE_PRICE: '0.05'
   DOCKER_COMPOSE_FILE_PATH: gwen/docker-compose.yml
+  ADDITIONAL_COMPOSE_COMMANDS: docker-compose -f gwen/docker-compose.yml run gwen false
   IMAGE_TAG: ${{github.event.client_payload.commitId || github.sha}}
   DEPLOY_STEP_SHOULD_DEPLOY: 'false'
 jobs:
@@ -28,7 +29,7 @@ jobs:
       EC2_HOST: ${{ env.EC2_HOST }}
       EC2_INSTANCE_ID: ${{ env.EC2_INSTANCE_ID }}
     steps:
-      - name: 'Run :: Decoding Secrets 46635962-668a-4d47-a190-5df6128045f6'
+      - name: 'Run :: Decoding Secrets 23290c27-c019-4c45-8e32-bbacda0b9379'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -38,7 +39,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials d4f3549d-df9d-416a-9db8-11961aa3eaa4'
+      - name: 'Run :: Configure AWS credentials 90819adf-802c-4e62-95a7-b42ca7409c5c'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
@@ -124,7 +125,7 @@ jobs:
       - name: 'Run :: Checkout Specific Commit'
         if: ${{ github.event.client_payload.commitId != null }}
         run: git checkout ${{ github.event.client_payload.commitId }}
-      - name: 'Run :: Decoding Secrets 3608d634-f50e-4a0f-98ea-1cb1b3cb5a0d'
+      - name: 'Run :: Decoding Secrets 01b204fe-2e3b-4596-866f-580a7cb25865'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -148,7 +149,7 @@ jobs:
     needs:
       - compose-job
     steps:
-      - name: 'Run :: Decoding Secrets 163ddc83-7dac-42db-a6c4-c795c1fc05eb'
+      - name: 'Run :: Decoding Secrets 2831a4ab-9b3c-44a1-99cb-c6281e242a28'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -185,7 +186,7 @@ jobs:
       - compose-job
     if: ${{ always() }}
     steps:
-      - name: 'Run :: Decoding Secrets 9f4cfbc5-54dd-4f4b-a558-088ff9db6dd8'
+      - name: 'Run :: Decoding Secrets 7171e7fa-abbe-4567-8dfb-ee7ab9d632db'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -195,7 +196,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials d11017f0-2f93-497b-9492-cf6973d7d6cc'
+      - name: 'Run :: Configure AWS credentials f59a00ae-8eba-499b-a910-d2cd0e023fb2'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
