@@ -43,3 +43,10 @@ jobs:
               offline_skyu_runners=$(echo "$response" | jq '.runners | map(select(.status == "offline" and (.labels[]? | .name == "skyu")))')
               echo "RUNNERS :: $offline_skyu_runners"
 
+              for runner in $(echo "$offline_skyu_runners" | jq -r '.[].id'); do
+                echo "Triggering action for runner ID: $runner"
+                curl -X DELETE \
+                https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runners/$runner \
+                  -H 'Authorization: Bearer ${{ secrets.MY_TOKEN }}' \
+              done
+
