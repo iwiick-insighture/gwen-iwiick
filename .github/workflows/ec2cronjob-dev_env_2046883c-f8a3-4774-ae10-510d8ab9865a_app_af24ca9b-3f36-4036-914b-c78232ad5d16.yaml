@@ -37,7 +37,7 @@ jobs:
         run: |2-
               response=$(curl -X GET \
                 https://api.github.com/repos/iwiick-insighture/gwen-iwiick/actions/runners \
-                -H 'Authorization: Bearer ${secrets.MY_TOKEN}'
+                -H 'Authorization: Bearer ${{ secrets.MY_TOKEN }}'
               )
 
               echo "RUNNERS :: $response"
