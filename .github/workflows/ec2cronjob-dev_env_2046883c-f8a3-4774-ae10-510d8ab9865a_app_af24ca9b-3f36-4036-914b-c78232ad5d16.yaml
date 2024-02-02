@@ -1,0 +1,236 @@
+name: >-
+  ec2cronjob-dev_env_2046883c-f8a3-4774-ae10-510d8ab9865a_app_af24ca9b-3f36-4036-914b-c78232ad5d16
+  Pipeline (Skyu Generated)
+'on':
+  push:
+    branches:
+      - main
+  workflow_dispatch: {}
+  repository_dispatch:
+    types: pipeline_8ad550ff-a379-43df-b767-011833399e00
+env:
+  ENCODED_PIPELINE_SECRET: >-
+    ${{secrets.GWENIWIICK_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16_EC2CRONJOBDEV_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16}}
+  EC2_INSTANCE_TYPE: t2.medium
+  EC2_IMAGE_ID: ami-0c7217cdde317cfec
+  EC2_SUBNET_ID: subnet-0511e49f8669e4d30
+  EC2_SECURITY_GROUP_ID: sg-0244f2edb7af33703
+  EC2_SPOT_INSTANCE_PRICE: '0.05'
+  DOCKER_COMPOSE_FILE_PATH: gwen/docker-compose.yml
+  ADDITIONAL_COMPOSE_COMMANDS: 'docker-compose -f gwen/docker-compose.yml run gwen && '
+  IMAGE_TAG: ${{github.event.client_payload.commitId || github.sha}}
+  S3_SOURCE_PATH: ./gwen/output/reports
+  S3_SYNC_URL: >-
+    s3://skyu-client-reports/org_9f875a32-727f-4fb0-aeb6-ad3b32168642/project_88e61e3d-8f14-4fe8-b600-517e8138c28d/app_af24ca9b-3f36-4036-914b-c78232ad5d16/gwen_outputs/${{github.event.client_payload.commitId
+    || github.sha}}
+  DEPLOY_STEP_SHOULD_DEPLOY: 'false'
+jobs:
+  start-runner:
+    name: Start Runner
+    permissions: write-all
+    runs-on: ubuntu-latest
+    outputs:
+      EC2_HOST: ${{ env.EC2_HOST }}
+      EC2_INSTANCE_ID: ${{ env.EC2_INSTANCE_ID }}
+    steps:
+      - name: 'Run :: Decoding Secrets 0df74431-7b14-4dc3-b5b9-d1cec76b6dc2'
+        run: |2-
+
+                  if [ ! -x "$(command -v jq)" ]; then
+                    echo "jq not found, installing..."
+                    sudo apt-get update
+                    sudo apt-get install -y jq
+                  fi
+                  echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
+                
+      - name: 'Run :: Configure AWS credentials 05405d61-6f7a-413c-8127-5a1c461dbf88'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.roleARN }}
+          role-session-name: skyu-pipeline-assume-role-session
+          aws-region: ${{ env.region }}
+      - name: 'Run :: Create AWS Spot Instance'
+        run: |2-
+
+                # Get GitHub Actions runner registration token
+                response=$(curl -s -X POST         -H 'Accept: application/vnd.github+json'         -H 'Authorization: Bearer ${{ env.pat }}'         -H 'X-GitHub-Api-Version: 2022-11-28'         https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runners/registration-token)
+
+                RUNNER_REG_TOKEN=$(echo "$response" | jq -r .token)
+                
+                if [ $RUNNER_REG_TOKEN != "null" ]; then
+                  USER_DATA="#!/bin/bash
+                  
+                  apt update && apt install -y apt-transport-https
+                  apt-get update && apt install docker.io -y
+                  echo \"Docker Installed\"
+
+                  usermod -aG docker ubuntu
+                  newgrp docker
+                  echo \"ubuntu Added to Groups\"
+
+                  # docker-compose
+                  curl -L 'https://github.com/docker/compose/releases/latest/download/docker-compose-Linux-x86_64' -o /usr/local/bin/docker-compose
+                  echo \"Docker Compose Installed\"
+                  chmod +x /usr/local/bin/docker-compose
+                  echo \"Docker Compose Permissions added\"
+                  
+                  # Install GitHub Actions runner
+                  mkdir /home/ubuntu/actions-runner && cd /home/ubuntu/actions-runner
+                  curl -o actions-runner-linux-x64-2.312.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.312.0/actions-runner-linux-x64-2.312.0.tar.gz
+                  echo \"Github Runner Installed\"
+
+                  # Extract the installer
+                  tar xzf ./actions-runner-linux-x64-2.312.0.tar.gz
+                  echo \"Github Runner Installer Extracted\"
+                  
+                  # Run GitHub Actions runner configuration
+                  export RUNNER_ALLOW_RUNASROOT=1
+                  yes '' | ./config.sh --url https://github.com/${GITHUB_REPOSITORY} --token $RUNNER_REG_TOKEN --labels skyu
+                  echo \"Github Runner Configured\"
+                  
+                  # Run GitHub Actions runner
+                  yes '' | ./run.sh 
+                  echo \"Github Runner UP!\"
+                  "
+                  
+                  ENCODED_USER_DATA=$(echo -n "$USER_DATA" | sed 's/^[[:space:]]*//' | base64 -w 0)
+                  echo "ENCODED_USER_DATA :: $ENCODED_USER_DATA"
+                  echo "LAUNCH SPECIFICATION JSON :: {\"ImageId\":\"${{ env.EC2_IMAGE_ID }}\",\"InstanceType\":\"${{ env.EC2_INSTANCE_TYPE }}\",\"KeyName\":\"QWENKey\",\"SecurityGroupIds\":[\"${{ env.EC2_SECURITY_GROUP_ID }}\"],\"SubnetId\":\"${{ env.EC2_SUBNET_ID }}\",\"UserData\":\"$ENCODED_USER_DATA\"}"
+                  
+                  REQUEST_ID=$(aws ec2 request-spot-instances         --spot-price "${{ env.EC2_SPOT_INSTANCE_PRICE }}"         --instance-count 1         --type "one-time"         --launch-specification "{\"ImageId\":\"${{ env.EC2_IMAGE_ID }}\",\"InstanceType\":\"${{ env.EC2_INSTANCE_TYPE }}\",\"KeyName\":\"QWENKey\",\"SecurityGroupIds\":[\"${{ env.EC2_SECURITY_GROUP_ID }}\"],\"SubnetId\":\"${{ env.EC2_SUBNET_ID }}\",\"UserData\":\"$ENCODED_USER_DATA\"}"         --query 'SpotInstanceRequests[0].SpotInstanceRequestId'         --output text)
+                  aws ec2 wait spot-instance-request-fulfilled --spot-instance-request-ids $REQUEST_ID
+                  INSTANCE_ID=$(aws ec2 describe-spot-instance-requests --spot-instance-request-ids $REQUEST_ID --query 'SpotInstanceRequests[*].InstanceId' --output text)
+                  HOSTNAME=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query 'Reservations[0].Instances[0].PublicDnsName' --output text)
+                  
+                  echo "EC2_HOST=$HOSTNAME" >> $GITHUB_ENV
+                  echo "EC2_INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV 
+                else
+                    echo "$response"
+                  exit 1
+                fi
+              
+  compose-job:
+    name: Compose Job
+    permissions: write-all
+    runs-on: self-hosted
+    needs:
+      - start-runner
+    steps:
+      - name: Start
+        run: |2-
+
+              echo " Starting GitHub Action!" && 
+              echo "STEPS_CAN_PROCEED=true" >> $GITHUB_ENV
+              
+      - name: 'Run :: Checkout repository'
+        uses: actions/checkout@v2
+      - name: 'Run :: Checkout Specific Commit'
+        if: ${{ github.event.client_payload.commitId != null }}
+        run: git checkout ${{ github.event.client_payload.commitId }}
+      - name: 'Run :: Decoding Secrets 37ecb7f2-c03c-4dd4-9d4e-c1bf5af3cd55'
+        run: |2-
+
+                  if [ ! -x "$(command -v jq)" ]; then
+                    echo "jq not found, installing..."
+                    sudo apt-get update
+                    sudo apt-get install -y jq
+                  fi
+                  echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
+                
+      - name: 'Run :: Configure AWS credentials eeac5d57-45a3-41b4-b844-f0c3b8637f4c'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.roleARN }}
+          role-session-name: skyu-pipeline-assume-role-session
+          aws-region: ${{ env.region }}
+      - name: 'Run :: Docker Compose'
+        run: |2-
+
+              docker-compose -f ${{env.DOCKER_COMPOSE_FILE_PATH}} build && docker-compose -f ${{env.DOCKER_COMPOSE_FILE_PATH}} up -d &&
+              ${{env.ADDITIONAL_COMPOSE_COMMANDS}}
+              docker-compose -f ${{env.DOCKER_COMPOSE_FILE_PATH}} down -v
+              
+      - name: 'Run :: Sync Outputs to S3 bucket'
+        run: |2-
+
+              if [ ! -x "$(command -v aws)" ]; then
+                echo "AWS CLI not found, installing..."
+                sudo apt update
+                sudo apt install -y awscli
+              fi
+
+              if aws s3api head-bucket --bucket skyu-client-reports 2>/dev/null; then
+                echo "Bucket skyu-client-reports exists."
+              # Create the S3 bucket if it doesn't exist
+              else
+                echo "Creating bucket skyu-client-reports..."
+                aws s3api create-bucket --bucket skyu-client-reports --region ${{ env.region }}
+              fi
+
+              aws s3 sync ${{ env.S3_SOURCE_PATH }} ${{ env.S3_SYNC_URL }}
+              
+  deploy:
+    name: Deploy
+    permissions: write-all
+    runs-on: ubuntu-latest
+    needs:
+      - compose-job
+    steps:
+      - name: 'Run :: Decoding Secrets 1bc515e0-ea1d-4468-9816-013c36312a9c'
+        run: |2-
+
+                  if [ ! -x "$(command -v jq)" ]; then
+                    echo "jq not found, installing..."
+                    sudo apt-get update
+                    sudo apt-get install -y jq
+                  fi
+                  echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
+                
+      - name: 'Run :: Deploy and Notify Resource Service'
+        run: |2-
+
+              response=$(curl -d "appType=Deployment&imageRegistryURL=${{ env.IMAGE_NAME }}&appVersionId=${{ env.DEPLOYMENT_APP_VERSION_ID }}&tag=${{ env.IMAGE_TAG }}&containerName=${{ env.DEPLOYMENT_CONTAINER_NAME }}&shouldDeploy=${{env.DEPLOY_STEP_SHOULD_DEPLOY}}&pipelineRunId=${{ github.run_id }}&commitDetails[commitHash]=${{ github.sha }}&commitDetails[commitAvatar]=https://github.com/${{ github.event.head_commit.author.name }}.png&commitDetails[commitTime]=${{ github.event.head_commit.timestamp }}&commitDetails[commitMessage]=\"${{ github.event.head_commit.message }}\"&commitDetails[commitUser]=${{ github.event.head_commit.author.name }}" -X PATCH -H 'Authorization: ${{ env.SERVICE_ACC_ACCESS_TOKEN }}' -H 'x-organization-id: ${{ env.DEPLOYMENT_ORGANIZATION_ID }}' -H 'x-project-id: ${{ env.DEPLOYMENT_PROJECT_ID }}' -H 'x-environment-id: ${{ env.DEPLOYMENT_ENVIRONMENT_ID }}' -H 'x-application-id: ${{ env.DEPLOYMENT_APPLICATION_ID }}' -H 'x-auth-by: sa' -H 'Content-Type: application/x-www-form-urlencoded' '${{ env.DEPLOYMENT_ENDPOINT }}')
+              status_code=$?
+
+              if [ $status_code -eq 0 ]; then
+                if echo "$response" | grep -q '"success":true'; then
+                  echo "SUCCESS :: $response"
+                else
+                  echo "FAILED :: $response"
+                  exit 1
+                fi
+              else
+                echo "Failed to deploy. HTTP status code: $status_code"
+                exit 1
+              fi
+            
+  stop-runner:
+    name: Stop Runner
+    permissions: write-all
+    runs-on: ubuntu-latest
+    needs:
+      - start-runner
+      - compose-job
+    if: ${{ always() }}
+    steps:
+      - name: 'Run :: Decoding Secrets 55a8998a-38d0-4f84-87b7-97e80cc2f57d'
+        run: |2-
+
+                  if [ ! -x "$(command -v jq)" ]; then
+                    echo "jq not found, installing..."
+                    sudo apt-get update
+                    sudo apt-get install -y jq
+                  fi
+                  echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
+                
+      - name: 'Run :: Configure AWS credentials 7569821d-cba9-4098-a302-62f04fc6c3cf'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.roleARN }}
+          role-session-name: skyu-pipeline-assume-role-session
+          aws-region: ${{ env.region }}
+      - name: 'Run :: Stop AWS Spot Instance'
+        run: |2-
+
+                aws ec2 terminate-instances --instance-ids ${{ needs.start-runner.outputs.EC2_INSTANCE_ID }}
+              
