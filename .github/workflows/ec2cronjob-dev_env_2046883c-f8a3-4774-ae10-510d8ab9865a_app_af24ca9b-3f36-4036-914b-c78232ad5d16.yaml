@@ -39,7 +39,7 @@ jobs:
               https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runners \
               -H 'Authorization: Bearer ${secrets.MY_TOKEN}')
 
-              offline_skyu_runners=$(echo "$response" | jq -r '.runners[] | select(.status == "offline" and any(.labels[]; .name == "skyu"))')
+              offline_skyu_runners=$(echo "$response" | jq -r 'if has("runners") then .runners[] | select(.status == "offline") else empty end')
 
               echo "Offline Runners with 'skyu' tag:"
               echo "$offline_skyu_runners"
