@@ -7,15 +7,15 @@ name: >-
       - main
   workflow_dispatch: {}
   repository_dispatch:
-    types: pipeline_45306bf9-a72e-4a15-856a-bd654200cdfb
+    types: pipeline_d1d2ef79-3cf2-452a-99b8-9fc9afb4b4fa
 env:
   ENCODED_PIPELINE_SECRET: >-
     ${{secrets.GWENIWIICK_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16_EC2CRONJOBDEV_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16}}
   EC2_INSTANCE_TYPE: t2.medium
   EC2_IMAGE_ID: ami-0c7217cdde317cfec
-  EC2_SUBNET_ID: subnet-05ccd67a249a5f463
-  EC2_SECURITY_GROUP_ID: sg-07b2c3cfda304aca3
-  EC2_SPOT_INSTANCE_BID_PRICE: '0.167300'
+  EC2_SUBNET_ID: subnet-0511e49f8669e4d30
+  EC2_SECURITY_GROUP_ID: sg-0244f2edb7af33703
+  EC2_SPOT_INSTANCE_BID_PRICE: '0.05'
   DOCKER_COMPOSE_FILE_PATH: gwen/docker-compose.yml
   ADDITIONAL_COMPOSE_COMMANDS: 'docker-compose -f gwen/docker-compose.yml run gwen && '
   IMAGE_TAG: ${{github.event.client_payload.commitId || github.sha}}
@@ -33,7 +33,7 @@ jobs:
       EC2_HOST: ${{ env.EC2_HOST }}
       EC2_INSTANCE_ID: ${{ env.EC2_INSTANCE_ID }}
     steps:
-      - name: 'Run :: Decoding Secrets 01d114a0-032f-4799-b4ed-777acabe6876'
+      - name: 'Run :: Decoding Secrets a58e823e-2587-410e-95c7-5d3529fe6ccf'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -43,7 +43,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials 6599a0a1-9f66-420c-8e0b-6d899246ed38'
+      - name: 'Run :: Configure AWS credentials e96734fa-69da-492a-b23e-7c6773b27a33'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
@@ -127,7 +127,7 @@ jobs:
       - name: 'Run :: Checkout Specific Commit'
         if: ${{ github.event.client_payload.commitId != null }}
         run: git checkout ${{ github.event.client_payload.commitId }}
-      - name: 'Run :: Decoding Secrets a0ff929e-0bf3-405f-9e1e-c8b424ea35f0'
+      - name: 'Run :: Decoding Secrets 5c16f214-e101-4c50-86aa-13a60f80d88b'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -137,7 +137,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials 11c15747-1997-4828-b95a-2e2be2124712'
+      - name: 'Run :: Configure AWS credentials 06d71736-7066-4d53-8f25-924310b137f1'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
@@ -176,7 +176,7 @@ jobs:
     needs:
       - compose-job
     steps:
-      - name: 'Run :: Decoding Secrets 04979414-881e-48bc-93c0-be056649316a'
+      - name: 'Run :: Decoding Secrets ac35f8dd-286a-4d13-be50-765a8f501375'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -206,7 +206,7 @@ jobs:
       - compose-job
     if: ${{ always() }}
     steps:
-      - name: 'Run :: Decoding Secrets a5df2234-8143-4a95-87c7-779b0dc711c0'
+      - name: 'Run :: Decoding Secrets 7e8bab6d-b1aa-41c6-9535-82cde2eb0bc1'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -216,7 +216,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials bf0f1879-5015-4d5f-a979-39de6cf6f56d'
+      - name: 'Run :: Configure AWS credentials 94e45ad4-52f3-403e-916c-b5ec897848be'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
