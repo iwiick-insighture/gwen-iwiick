@@ -7,7 +7,7 @@ name: >-
       - main
   workflow_dispatch: {}
   repository_dispatch:
-    types: pipeline_935c8464-a64a-4491-a457-5a30c77db1b0
+    types: pipeline_2bebb1ac-cce7-484f-9dee-543ae801409f
 env:
   ENCODED_PIPELINE_SECRET: >-
     ${{secrets.GWENIWIICK_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16_EC2CRONJOBDEV_ENV_2046883CF8A34774AE10510D8AB9865A_APP_AF24CA9B3F364036914BC78232AD5D16_YAML}}
@@ -35,7 +35,7 @@ jobs:
     steps:
       - name: 'Run :: Checkout repository for CodeQL'
         uses: actions/checkout@v4
-      - name: 'Run :: Decoding Secrets a41e60d4-5745-44de-81fe-c635bf656f02'
+      - name: 'Run :: Decoding Secrets 4bc40836-5dcd-4b53-b693-7bee4ef3c665'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -80,7 +80,7 @@ jobs:
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
-      - name: 'Run :: Decoding Secrets 9509e85f-6af4-47df-95e2-8837f9971af8'
+      - name: 'Run :: Decoding Secrets d28c8d30-9d23-4418-b9d1-bb3ebe954b7c'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -107,7 +107,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.client_payload.releaseData }}
     steps:
-      - name: 'Run :: Decoding Secrets 9a885b0d-352d-43df-8c1d-1885301a25a2'
+      - name: 'Run :: Decoding Secrets d13f9e13-c990-41ae-ab2f-0e64adb4e10b'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -150,7 +150,7 @@ jobs:
       EC2_HOST: ${{ env.EC2_HOST }}
       EC2_INSTANCE_ID: ${{ env.EC2_INSTANCE_ID }}
     steps:
-      - name: 'Run :: Decoding Secrets d3cf4ecd-7b50-4cbe-bb93-cbefbea88908'
+      - name: 'Run :: Decoding Secrets a8fbd29d-e6d0-4184-a5aa-ee89f88be090'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -160,7 +160,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials fa5d627e-fcfc-435f-a177-7b2f8dc75242'
+      - name: 'Run :: Configure AWS credentials 136e8ece-0e05-435b-b3f9-47dd64794cb4'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
@@ -171,7 +171,7 @@ jobs:
 
                 # Get GitHub Actions runner registration token
             
-                response=$(curl -s -X POST -H 'Accept: application/vnd.github+json' -H 'Authorization: Bearer ${{ env.pat }}' -H 'X-GitHub-Api-Version: 2022-11-28'  'https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runners/registration-token')
+                response=$(curl -s -X POST         -H 'Accept: application/vnd.github+json'         -H 'Authorization: Bearer ${{ env.pat }}'         -H 'X-GitHub-Api-Version: 2022-11-28'         https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runners/registration-token)
 
                 RUNNER_REG_TOKEN=$(echo "$response" | jq -r .token)
                 
@@ -248,7 +248,7 @@ jobs:
 
               git fetch
               git checkout ${{ github.event.client_payload.commitId }}
-      - name: 'Run :: Decoding Secrets bd70937c-e6c2-4613-a6e1-0b02b499f2c4'
+      - name: 'Run :: Decoding Secrets f4f9c987-2f6c-42cf-9d5e-cc695f10dbd3'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -258,7 +258,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials e7a1e0dd-e0f0-4713-ba97-d59109de58b0'
+      - name: 'Run :: Configure AWS credentials 1454a25d-7bfd-47a3-a9e9-37ad6e20cc06'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
@@ -299,7 +299,7 @@ jobs:
       - compose-job
     if: ${{ !(failure() || cancelled()) }}
     steps:
-      - name: 'Run :: Decoding Secrets 5df15752-bc04-4d0d-950c-ac4b072bf114'
+      - name: 'Run :: Decoding Secrets e2b3d05a-d833-4361-80a8-c931141a58b8'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -323,7 +323,7 @@ jobs:
       - compose-job
     if: ${{ failure() || cancelled() }}
     steps:
-      - name: 'Run :: Decoding Secrets 9cee4382-8a43-4f22-a005-bb6c19d2b017'
+      - name: 'Run :: Decoding Secrets aa5a0a6b-2818-412c-90f3-cd17dc945130'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -346,7 +346,7 @@ jobs:
       - compose-job
     if: ${{ github.event.client_payload.releaseData == null }}
     steps:
-      - name: 'Run :: Decoding Secrets f6c8f421-cb1f-4ac4-b9ca-3b2f3303e066'
+      - name: 'Run :: Decoding Secrets 56245bc7-74c6-4a0f-bb96-e9e9037f0133'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -384,7 +384,7 @@ jobs:
       - compose-job
     if: ${{ always() }}
     steps:
-      - name: 'Run :: Decoding Secrets 8bde9f33-f74f-43ef-85f2-2d72c33de077'
+      - name: 'Run :: Decoding Secrets f9fbd527-0b45-4ddf-9209-1da9534ff4d6'
         run: |2-
 
                   if [ ! -x "$(command -v jq)" ]; then
@@ -394,7 +394,7 @@ jobs:
                   fi
                   echo "${{ env.ENCODED_PIPELINE_SECRET }}" | base64 --decode | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while read line; do echo "$line" >> $GITHUB_ENV; echo "::add-mask::${line#*=}"; done
                 
-      - name: 'Run :: Configure AWS credentials 1aa55925-7445-40c4-9f8e-90cee62c02f1'
+      - name: 'Run :: Configure AWS credentials 4dc849a1-6b3f-46fa-b914-b4383646a450'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.roleARN }}
@@ -406,7 +406,8 @@ jobs:
                 aws ec2 terminate-instances --instance-ids ${{ needs.start-runner.outputs.EC2_INSTANCE_ID }}
                 gh_runner_label=${{ needs.start-runner.outputs.EC2_SKYU_RUNNER }}
 
-                response=$(curl -X GET -H 'Authorization: Bearer ${{ env.pat }}'  'https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runners')
+                response=$(curl -X GET         https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runners         -H 'Authorization: Bearer ${{ env.pat }}'
+                )
 
                 offline_skyu_runners=$(echo "$response" | jq '.runners | map(select((.labels? | any(.name == "EC2_SKYU_RUNNER_${{env.IMAGE_TAG}}"))))')
                 echo "Offline Skyu Runners :: $offline_skyu_runners"
@@ -415,7 +416,7 @@ jobs:
                 for runner in $(echo "$offline_skyu_runners" | jq -r '.[].id'); do
                   echo "Triggering action for runner ID: $runner"
 
-                  curl -X DELETE -H 'Authorization: Bearer ${{ env.pat }}'  'https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runners/$runner'
+                  curl -X DELETE         https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runners/$runner           -H 'Authorization: Bearer ${{ env.pat }}'
 
                 done
               
