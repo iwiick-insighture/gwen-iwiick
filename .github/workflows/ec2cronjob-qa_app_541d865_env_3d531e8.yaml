@@ -7,7 +7,7 @@ name: ec2cronjob-qa_app_541d865_env_3d531e8 Pipeline (Skyu Generated)
     types: pipeline_03719e1c-e045-424f-9137-60901e1419ff
 env:
   ENCODED_PIPELINE_SECRET: ${{secrets.GWENIWIICK_EC2CRONJOBQA_APP_541D865_ENV_3D531E8}}
-  COMMIT_ID: ${{github.event.client_payload.commitId || github.sha}}
+  COMMIT_ID: ${{github.event.client_payload.commitId || github.sha || github.run_id}}
   DEPLOY_STEP_SHOULD_DEPLOY: 'false'
 jobs:
   code-scan:
@@ -237,9 +237,9 @@ jobs:
       - name: 'Run :: Sync Outputs with File Service'
         run: |2-
 
-              zip -r pipeline-artefact.zip ${{ env.ARTEFACT_SOURCE }}
+              zip -r ${{ env.COMMIT_ID }}-pipeline-artefact.zip ${{ env.ARTEFACT_SOURCE }}
 
-              response=$(curl -X POST -F 'file=@pipeline-artefact.zip' -F 'provider=aws' -F 'resourceType=pipeline-artefact' -F 'cloudStoragePath=/${{ env.PIPELINE_APPLICATION_ID }}/pipeline-artefacts/${{ env.COMMIT_ID }}'  -H 'Authorization: ${{ env.SERVICE_ACC_ACCESS_TOKEN }}' -H 'x-organization-id: ${{ env.PIPELINE_ORGANIZATION_ID }}' -H 'x-project-id: ${{ env.PIPELINE_PROJECT_ID }}' -H 'x-environment-id: ${{ env.PIPELINE_ENVIRONMENT_ID }}' -H 'x-trace-id: ${{ env.PIPELINE_TRACE_ID }}' -H 'x-resource-id: ${{ env.PIPELINE_APPLICATION_ID }}' -H 'x-auth-by: sa' -H 'Content-Type: multipart/form-data'  '${{ env.FILE_SVC_FOLDER_UPLOAD_EP }}')
+              response=$(curl -X POST -F 'file=@${{ env.COMMIT_ID }}-pipeline-artefact.zip' -F 'provider=aws' -F 'resourceType=pipeline-artefact' -F 'cloudStoragePath=/${{ env.PIPELINE_APPLICATION_ID }}/pipeline-artefacts/'  -H 'Authorization: ${{ env.SERVICE_ACC_ACCESS_TOKEN }}' -H 'x-organization-id: ${{ env.PIPELINE_ORGANIZATION_ID }}' -H 'x-project-id: ${{ env.PIPELINE_PROJECT_ID }}' -H 'x-environment-id: ${{ env.PIPELINE_ENVIRONMENT_ID }}' -H 'x-trace-id: ${{ env.PIPELINE_TRACE_ID }}' -H 'x-resource-id: ${{ env.PIPELINE_APPLICATION_ID }}' -H 'x-auth-by: sa' -H 'Content-Type: multipart/form-data'  '${{ env.FILE_SVC_FOLDER_UPLOAD_EP }}')
 
               if echo "$response" | grep -q '"success":true'; then
                 echo "SUCCESS :: $response"
