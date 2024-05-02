@@ -7,10 +7,11 @@ name: ec2cronjob-dev_app_3da30b8_env_c6bda5f Pipeline (Skyu Generated)
       - v*
   workflow_dispatch: {}
   repository_dispatch:
-    types: pipeline_99cdc775-ea2c-481a-9b1e-61bba3fccf78
+    types: pipeline_e74a7df2-0702-4ec2-9cea-ed4450e9b847
 env:
   ENCODED_PIPELINE_SECRET: ${{secrets.GWENIWIICK_EC2CRONJOBDEV_APP_3DA30B8_ENV_C6BDA5F}}
   COMMIT_ID: ${{github.event.client_payload.commitId || github.sha || github.run_id}}
+  Hello: VALUEEEEEEE
   DEPLOY_STEP_SHOULD_DEPLOY: 'false'
 jobs:
   code-scan:
