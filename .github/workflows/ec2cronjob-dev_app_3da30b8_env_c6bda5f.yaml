@@ -7,7 +7,7 @@ name: ec2cronjob-dev_app_3da30b8_env_c6bda5f Pipeline (Skyu Generated)
       - v*
   workflow_dispatch: {}
   repository_dispatch:
-    types: pipeline_57626e45-bcea-4d40-a5fa-368ec6aa0dc1
+    types: pipeline_926a6692-abbe-4f43-981c-c511ce2679bb
 env:
   ENCODED_PIPELINE_SECRET: ${{secrets.GWENIWIICK_EC2CRONJOBDEV_APP_3DA30B8_ENV_C6BDA5F}}
   COMMIT_ID: ${{github.event.client_payload.commitId || github.sha || github.run_id}}
@@ -183,6 +183,7 @@ jobs:
 
                 # Setting Environment Variables
                 export BUILT_WITH=skyu
+                ${{ env.EC2_SPOT_INSTANCE_ENV_VARS }}
                 
                 # Install GitHub Actions runner
                 mkdir /home/ubuntu/actions-runner && cd /home/ubuntu/actions-runner
